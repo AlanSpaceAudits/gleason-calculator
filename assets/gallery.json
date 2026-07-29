@@ -1,0 +1,43 @@
+{
+  "sheets": [
+    {
+      "id": "reprint",
+      "label": "1892 plate, reprinted 2013",
+      "holding": "American Geographical Society Library, University of Wisconsin-Milwaukee",
+      "note": "The clearest map face of the three, and the one the chart page measures on. The reprint omits the two movable indicating arms that came with the original instrument.",
+      "image": "assets/gallery/reprint.jpg",
+      "width": 1700,
+      "height": 2559,
+      "scan_px": [
+        5980,
+        9000
+      ]
+    },
+    {
+      "id": "boston",
+      "label": "1892 original, Boston Public Library",
+      "holding": "Norman B. Leventhal Map & Education Center, Boston Public Library",
+      "note": "An 1892 impression with one indicating arm still pivoted at the centre, swung up over Scandinavia. The arm is graduated in degrees of latitude, and it is the part of the instrument that does the work.",
+      "image": "assets/gallery/boston.jpg",
+      "width": 1700,
+      "height": 2420,
+      "scan_px": [
+        4773,
+        6794
+      ]
+    },
+    {
+      "id": "yale",
+      "label": "1892 original, Yale University Library",
+      "holding": "Yale University Library",
+      "note": "A second 1892 impression, its arm swung right across Asia and Europe. Set beside the Boston copy it shows the arm was meant to be turned to wherever you were working, not parked.",
+      "image": "assets/gallery/yale.jpg",
+      "width": 1700,
+      "height": 2392,
+      "scan_px": [
+        4636,
+        6523
+      ]
+    }
+  ]
+}

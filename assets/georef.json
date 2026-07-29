@@ -1,0 +1,68 @@
+{
+  "sheet": "sources/gleason_1892_sheet_full.jpg",
+  "sheet_px": [
+    4773,
+    6794
+  ],
+  "center_px": [
+    2379.61,
+    3407.15
+  ],
+  "px_per_degree": 10.01053,
+  "hour_ring_outer_px": 2225.73,
+  "graticule_step_px": 150.343,
+  "graticule_worst_residual_px": 9.97,
+  "graticule_circles": [
+    [
+      10,
+      142
+    ],
+    [
+      20,
+      292
+    ],
+    [
+      30,
+      461
+    ],
+    [
+      40,
+      592
+    ],
+    [
+      50,
+      761
+    ],
+    [
+      60,
+      894
+    ],
+    [
+      70,
+      1054
+    ],
+    [
+      80,
+      1203
+    ],
+    [
+      90,
+      1352
+    ],
+    [
+      100,
+      1504
+    ],
+    [
+      110,
+      1653
+    ],
+    [
+      120,
+      1807
+    ]
+  ],
+  "meridian_rotation_deg": 90.0217,
+  "radius_180deg_px": 1801.9,
+  "coastline_agreement": 0.9681
+}

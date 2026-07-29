@@ -1,0 +1,15 @@
+{
+  "sheet": "sources/gleason_1892_yale_sheet.jpg",
+  "sheet_px": [
+    4636,
+    6523
+  ],
+  "center_px": [
+    2279.35,
+    3264.83
+  ],
+  "px_per_degree": 9.62041,
+  "meridian_rotation_deg": 90.4839,
+  "radius_180deg_px": 1731.67,
+  "coastline_agreement": 0.9385
+}

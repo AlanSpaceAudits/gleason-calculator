@@ -1,0 +1,27 @@
+{
+  "source": {
+    "title": "Gleason's new standard map of the world",
+    "author": "Gleason, Alexander",
+    "year": "1892 plate, reprinted 2013",
+    "publisher": "Buffalo Electrotype and Engraving Co.; reprinted by Lone Star Art",
+    "holding": "American Geographical Society Library, University of Wisconsin-Milwaukee",
+    "rights": "No known copyright restrictions on the 1892 work.",
+    "scan_px": [
+      5980,
+      9000
+    ]
+  },
+  "chart": {
+    "image": "assets/chart.jpg",
+    "width": 3450,
+    "height": 5192,
+    "center_px": [
+      1712.463,
+      2624.735
+    ],
+    "px_per_degree": 7.226538,
+    "radius_180deg_px": 1300.78,
+    "meridian_rotation_deg": 90.0387,
+    "coastline_agreement": 0.9846
+  }
+}

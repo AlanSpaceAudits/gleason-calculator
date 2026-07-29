@@ -1,0 +1,15 @@
+{
+  "sheet": "sources/gleason_1892_reprint_sheet.jpg",
+  "sheet_px": [
+    5980,
+    9000
+  ],
+  "center_px": [
+    2968.27,
+    4549.54
+  ],
+  "px_per_degree": 12.526,
+  "meridian_rotation_deg": 90.0387,
+  "radius_180deg_px": 2254.68,
+  "coastline_agreement": 0.9846
+}

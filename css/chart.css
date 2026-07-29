@@ -1,0 +1,680 @@
+/* Restrained cartographic UI: paper ground, hairline rules, engraved-plate
+   display face, tabular figures for every number. */
+
+:root {
+  --paper: #faf8f3;
+  --paper-2: #f2eee4;
+  --ink: #17150f;
+  --ink-2: #3c372d;
+  --ink-3: #5e5748;
+  --rule: #d5cec0;
+  --rule-2: #e6e0d3;
+  --vermilion: #a4161a;   /* the hour ring */
+  --teal: #0b7285;        /* point A */
+  --amber: #8a6d1f;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --stage-pad: 1rem;
+  /* from the group's mark */
+  --sky: #4bb4e6;
+  --sky-ink: #1d7fae;
+  --sky-wash: #eaf6fc;
+}
+
+* { box-sizing: border-box; }
+
+/* One clamped root size drives every other size on the page. Narrow phone to
+   wide desktop moves it from 15px to 20px, and everything scales with it. */
+html {
+  font-size: clamp(15px, 0.55vw + 13.4px, 24px);
+  background: var(--paper-2);
+}
+
+/* font-size must not be restated on html: on the root element rem resolves
+   against 16px, so a rem value here silently replaces the clamp above. */
+body {
+  margin: 0;
+  background: var(--paper-2);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ------------------------------------------------------------- masthead */
+
+.masthead {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.9rem 1.1rem;
+  padding: 0.85rem 1.75rem;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+
+.brand { display: block; flex: none; line-height: 0; }
+
+.brand img {
+  display: block;
+  width: 4rem;
+  height: 4rem;
+}
+
+.masthead-title { min-width: 0; }
+
+.presents {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--sky-ink);
+}
+
+.masthead h1 {
+  margin: 0.1rem 0 0;
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+}
+
+.masthead .sub {
+  margin: 0.25rem 0 0;
+  color: var(--ink-2);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.masthead nav { display: flex; align-items: center; gap: 0.25rem; }
+
+.masthead nav a {
+  padding: 0.375rem 0.875rem;
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.masthead nav a:hover { border-color: var(--rule); }
+.masthead nav a.current { border-color: var(--ink); color: var(--ink); }
+
+.masthead nav a.discord {
+  display: grid;
+  place-items: center;
+  margin-left: 0.5rem;
+  padding: 0.3rem;
+  border-color: var(--rule);
+}
+
+.masthead nav a.discord svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  fill: var(--sky-ink);
+}
+
+.masthead nav a.discord:hover { border-color: var(--sky-ink); background: var(--sky-wash); }
+
+.page-name {
+  margin: 0 0 1.1rem;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink-2);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* --------------------------------------------------------------- layout */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(22rem, 32vw, 38rem);
+  gap: 0;
+  align-items: start;
+}
+
+/* Controls stack in a column beside the chart rather than in a band above it,
+   which leaves the full height for the engraving. */
+/* Controls and the worked examples share a left column; the chart sits beside
+   them and spans both rows. */
+.stage {
+  padding: var(--stage-pad) 1.25rem 1.25rem 1.75rem;
+  display: grid;
+  grid-template-columns: clamp(16rem, 20vw, 21rem) minmax(0, 1fr);
+  grid-template-areas: "side chart";
+  align-items: start;
+  gap: 1rem;
+}
+
+/* The left column is exactly as tall as the chart beside it, so the examples
+   scroll within it instead of running the page past the engraving. */
+.side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: calc(100vh - 9rem);
+  max-height: calc(100dvh - 9rem);
+}
+
+/* All three columns end at the same depth. The chart is square and its width is
+   whichever of the column or the viewport height is smaller, so its measured
+   height is published as --chart-h and the two side columns take it. */
+/* Only where the three really sit side by side. Below this the controls stack
+   above the chart, so the column is taller than the chart by design. */
+@media (min-width: 87.5rem) {
+  .side { height: var(--chart-h, auto); max-height: none; }
+
+  /* The panel's box starts at the top of the row while the chart starts one
+     stage-padding below it, so the panel needs that much extra to finish level. */
+  .panel { height: calc(var(--chart-h, 0px) + var(--stage-pad)); max-height: none; }
+}
+
+.stage-bar { flex: none; }
+.canvas-wrap { grid-area: chart; }
+/* Scrolls inside itself, so working through the lessons never pushes the chart
+   or the readouts off screen. */
+.lessons-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* The controls read as a card like everything else, and the instruction line
+   fills what would otherwise be dead space beside the checkboxes. */
+.stage-bar {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  padding: 0.85rem 0.9rem 0.9rem;
+}
+
+.seg { display: flex; border: 1px solid var(--ink); }
+.seg button { flex: 1; }  /* halves match, so the two toggles line up */
+
+.seg button {
+  appearance: none;
+  border: 0;
+  border-right: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  padding: 0.45rem 0.6rem;
+  cursor: pointer;
+}
+
+.seg button:last-child { border-right: 0; }
+.seg button.on { background: var(--ink); color: var(--paper); }
+
+.stage-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+.stage-tools label { display: flex; align-items: center; gap: 0.375rem; cursor: pointer; }
+.stage-tools input { accent-color: var(--vermilion); }
+
+button.ghost {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.375rem 0.75rem;
+  cursor: pointer;
+}
+
+button.ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+/* Square, and as large as fits both the column and the viewport height, so a
+   wide screen shows a bigger chart instead of empty margins. */
+/* Grows to fill the column, but max-width caps it so the square never runs
+   past the bottom of the viewport. */
+.canvas-wrap {
+  position: relative;
+  min-width: 0;
+  max-width: calc(100vh - 9rem);
+  max-width: calc(100dvh - 9rem);
+  margin: 0 auto;
+}
+
+canvas#chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.busy {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(250, 248, 243, 0.82);
+  font-size: 0.875rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-2);
+}
+
+/* `display` on a class beats the hidden attribute, so restate it */
+.busy[hidden] { display: none; }
+
+.hint {
+  margin: 0.55rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--rule-2);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+/* ---------------------------------------------------------------- panel */
+
+.panel {
+  padding: var(--stage-pad) 1.75rem 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.panel > :last-child { margin-bottom: 1rem; }
+
+.card {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  padding: 1rem 1.15rem 1.15rem;
+}
+
+.card.accent { border-left: 3px solid var(--vermilion); }
+
+.card h2 {
+  margin: 0 0 0.625rem;
+  font-family: var(--serif);
+  font-size: 1.0rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.note {
+  margin: 0 0 0.75rem;
+  font-size: 0.7812rem;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.note.tight { margin: 0.625rem 0 0; }
+
+/* ---------------------------------------------------------------- points */
+
+.pt + .pt { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--rule-2); }
+
+.pt-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+.pt-head b { font-size: 0.8125rem; letter-spacing: 0.05em; }
+
+.dot { width: 0.625rem; height: 0.625rem; border-radius: 50%; border: 2px solid; flex: none; }
+.dot.a { border-color: var(--teal); }
+.dot.b { border-color: var(--vermilion); }
+
+select.places {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.3125rem 0.5rem;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+}
+
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+
+.pair label {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--ink-3);
+}
+
+.pair input {
+  width: 100%;
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  padding: 0.3125rem 0.4375rem;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+}
+
+input:focus, select:focus { outline: 2px solid var(--amber); outline-offset: -1px; }
+
+/* -------------------------------------------------------------- readouts */
+
+table.read { width: 100%; border-collapse: collapse; }
+
+table.read th {
+  width: 56%;
+  text-align: left;
+  font-weight: 400;
+  font-size: 0.7812rem;
+  color: var(--ink-2);
+  padding: 0.25rem 0.625rem 0.25rem 0;
+  vertical-align: baseline;
+}
+
+table.read td {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  padding: 0.25rem 0;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+table.read td.big { font-size: 1.0rem; font-weight: 600; }
+table.read td.muted { color: var(--ink-2); font-size: 0.75rem; }
+table.read td.warn { color: var(--vermilion); font-weight: 600; }
+table.read tr.rule th, table.read tr.rule td { border-top: 1px solid var(--rule-2); padding-top: 0.5625rem; }
+
+.tag {
+  display: inline-block;
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--rule);
+  padding: 0 0.3125rem;
+  margin-left: 0.375rem;
+  color: var(--ink-3);
+}
+
+.strip {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+  margin-bottom: 0.75rem;
+  background: var(--paper);
+}
+
+/* -------------------------------------------------------------- lessons */
+
+ol.lessons { margin: 0; padding-left: 1.125rem; display: flex; flex-direction: column; gap: 0.5625rem; }
+ol.lessons li { font-size: 0.8125rem; }
+
+ol.lessons button {
+  appearance: none;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  padding: 0 0 0.0625rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+ol.lessons button:hover { border-color: var(--ink); }
+ol.lessons p { margin: 0.125rem 0 0; font-size: 0.8125rem; line-height: 1.5; color: var(--ink-2); }
+
+/* ---------------------------------------------------------------- footer */
+
+.foot {
+  padding: 1.125rem 1.75rem 1.75rem;
+  border-top: 1px solid var(--rule);
+  background: var(--paper);
+  font-size: 0.75rem;
+  color: var(--ink-3);
+}
+
+.foot p { margin: 0 0 0.25rem; max-width: 90ch; }
+.muted { color: var(--ink-3); }
+
+/* ----------------------------------------------------------- reference */
+
+.doc { max-width: 74ch; margin: 0 auto; padding: 1.75rem; }
+.doc h2 { font-family: var(--serif); font-size: 1.25rem; margin: 2.0rem 0 0.625rem; font-weight: 600; }
+.doc h3 { font-family: var(--serif); font-size: 1.0rem; margin: 1.5rem 0 0.5rem; font-weight: 600; }
+.doc p { margin: 0 0 0.75rem; }
+.doc figure { margin: 1.125rem 0; }
+.doc figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); background: var(--paper); }
+.doc figcaption { margin-top: 0.4375rem; font-size: 0.7812rem; color: var(--ink-3); }
+.doc blockquote {
+  margin: 0.875rem 0;
+  padding: 0.125rem 0 0.125rem 1.0rem;
+  border-left: 2px solid var(--rule);
+  font-family: var(--serif);
+  font-size: 0.9688rem;
+  color: var(--ink-2);
+}
+.doc blockquote cite { display: block; margin-top: 0.375rem; font-family: var(--sans); font-size: 0.75rem; font-style: normal; color: var(--ink-3); }
+.doc table { width: 100%; border-collapse: collapse; margin: 0.875rem 0; font-size: 0.8438rem; }
+.doc th, .doc td { text-align: left; padding: 0.375rem 0.625rem 0.375rem 0; border-bottom: 1px solid var(--rule-2); }
+.doc td { font-variant-numeric: tabular-nums; }
+
+/* --------------------------------------------------------------- narrow */
+
+@media (max-width: 87.5rem) {
+  /* Stacked, the chart belongs between the controls and the examples, so the
+     column wrapper steps out of the way and its children join the grid. */
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "bar" "chart" "notes";
+    gap: 0.7rem;
+  }
+  .side { display: contents; }
+  .stage-bar { grid-area: bar; }
+  .lessons-card { grid-area: notes; }
+  .panel { height: auto; overflow-y: visible; }
+  /* stacked, there is nothing beside it to keep in view */
+  .lessons-card { overflow-y: visible; }
+  .stage-bar { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.6rem 0.9rem; }
+  .stage-tools { flex-direction: row; flex-wrap: wrap; margin-top: 0; gap: 0.9rem; }
+  .canvas-wrap { max-width: calc(100dvh - 13rem); }
+}
+
+@media (max-width: 68rem) {
+  .layout { grid-template-columns: 1fr; }
+
+  /* Narrow screens put the controls back above the chart, where a column of
+     them would eat width the engraving needs. */
+  .stage { padding: 0.75rem; gap: 0.6rem; }
+  .stage-tools { flex-direction: row; flex-wrap: wrap; margin-top: 0; width: 100%; }
+  .canvas-wrap { max-width: calc(100dvh - 14rem); }
+  .panel { padding: 0 0.75rem 2rem; overflow-y: visible; height: auto; }
+  .masthead {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 0.8rem 0.75rem;
+    gap: 0.5rem 0.7rem;
+  }
+  .masthead nav { grid-column: 1 / -1; flex-wrap: wrap; gap: 0.25rem 0.3rem; }
+  .brand img { width: 3rem; height: 3rem; }
+  .masthead h1 { font-size: 1.2rem; }
+
+  /* Room for the panel to start below the fold rather than crushing the chart */
+  .canvas-wrap { width: min(100%, calc(100dvh - 9rem)); }
+
+  /* Bigger hit areas for fingers */
+  .seg button { padding: 0.6rem 0.9rem; }
+  .stage-tools { gap: 0.9rem 1.1rem; flex-wrap: wrap; }
+  .stage-tools label { padding: 0.25rem 0; }
+  .stage-tools input { width: 1.1rem; height: 1.1rem; }
+  select.places, .pair input { padding: 0.55rem 0.6rem; }
+  ol.lessons button { padding: 0.3rem 0; }
+  .doc { padding: 1.25rem 0.9rem 2rem; }
+  .sheet-fig { margin-top: 1.4rem; }
+  .eq { padding: 0.6rem 0.7rem; }
+}
+}
+
+/* ------------------------------------------------------------- the sheets */
+
+.doc.wide { max-width: 62rem; }
+
+.seg.small button { padding: 0.3125rem 0.6875rem; font-size: 0.7812rem; }
+
+.sheet-fig {
+  margin: 1.625rem 0 0;
+  padding-top: 1.375rem;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(14rem, 22vw, 20rem);
+  gap: 1.625rem;
+  align-items: start;
+}
+
+.sheet-fig img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.sheet-fig figcaption { font-size: 0.8125rem; }
+.sheet-fig figcaption b { display: block; font-family: var(--serif); font-size: 0.9375rem; margin-bottom: 0.4375rem; }
+.sheet-fig figcaption p { margin: 0 0 0.5rem; color: var(--ink-2); line-height: 1.55; }
+.sheet-fig figcaption p.cred { color: var(--ink-3); font-size: 0.75rem; }
+
+@media (max-width: 860px) {
+  .sheet-fig { grid-template-columns: 1fr; gap: 0.875rem; }
+}
+
+ol.lessons li.on > button { border-color: var(--ink); font-weight: 600; }
+
+ol.lessons .detail {
+  margin-top: 0.5625rem;
+  padding-left: 0.6875rem;
+  border-left: 2px solid var(--vermilion);
+}
+
+ol.lessons .detail p {
+  margin: 0 0 0.5625rem;
+  font-size: 0.7812rem;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+ol.lessons .detail p:last-child { margin-bottom: 0; }
+
+table.read td.sub { font-size: 0.75rem; font-weight: 500; }
+
+/* Unit sub-lines span both columns so a long one cannot widen the label
+   column or push the table past the card. */
+table.read td.alt { white-space: normal; padding-top: 0; padding-bottom: 0.4375rem; }
+
+/* ------------------------------------------------------- worked equations */
+
+.eq {
+  margin-top: 0.875rem;
+  padding: 0.6875rem 0.8125rem;
+  background: var(--paper-2);
+  border-left: 2px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 0.7188rem;
+  line-height: 1.75;
+  color: var(--ink-3);
+  overflow-x: auto;
+}
+
+.eq h3 {
+  margin: 0.6875rem 0 0.1875rem;
+  font-family: var(--sans);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.eq h3:first-child { margin-top: 0; }
+.eq div { white-space: pre; }
+.eq .v { color: var(--ink); }
+.eq .r { color: var(--ink); font-weight: 600; }
+
+/* ---------------------------------------------------------- enlarged sheet */
+
+.sheet-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: rgba(23, 21, 15, 0.94);
+  padding: 0.75rem;
+  cursor: zoom-out;
+  text-align: center;
+}
+
+.lightbox[hidden] { display: none; }
+
+.lightbox-bar {
+  position: sticky;
+  top: 0;
+  margin: 0 0 0.6rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--paper-2);
+}
+
+/* Shown at the delivered width so the fine print is legible, and scrolled
+   rather than squeezed to fit. */
+.lightbox img {
+  display: inline-block;
+  width: min(100%, 1700px);
+  height: auto;
+  background: var(--paper);
+}
+
+body.locked { overflow: hidden; }
+
+.doc .lead {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0 0 1.5rem;
+}
+
+.doc h2:first-of-type { margin-top: 1.5rem; }
+
