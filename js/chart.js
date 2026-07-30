@@ -404,7 +404,7 @@ export class ChartView {
     ctx.restore();
   }
 
-  // The included angle, swept the short way, with its reading in sun time.
+  // The reading the two arms give: the angle between them, as sun time.
   _drawArmAngle(sx, sy, A, B, perDeg) {
     const ctx = this.ctx;
     const dlon = deltaLon(A.lon, B.lon);
@@ -413,14 +413,6 @@ export class ChartView {
     const r = Math.max(34, Math.min(perDeg * 52, 150));
 
     ctx.save();
-    ctx.setLineDash([5, 4]);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "#a4161a";
-    ctx.beginPath();
-    ctx.arc(sx, sy, r, tA, tA - dlon * D2R, dlon > 0);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
     const mid = tA - dlon * D2R / 2;
     const lx = sx + (r + 16) * Math.cos(mid);
     const ly = sy + (r + 16) * Math.sin(mid);
