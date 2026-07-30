@@ -1,5 +1,6 @@
 // Canvas view of the chart: pan, zoom, overlays, and the recentred rebuild.
 
+import { t } from "./i18n.js";
 import {
   makeProjection, makeObliqueProjection, greatCirclePath, centralAngle,
   deltaLon, MINUTES_PER_DEGREE_LON, D2R,
@@ -266,13 +267,13 @@ export class ChartView {
   // Drawn through the projection so they stay correct when it is recentred.
   _drawRings() {
     const RINGS = [
-      ["Arctic Circle", 66.56, "#1d7fae"],
-      ["Tropic of Cancer", 23.44, "#8a6d1f"],
-      ["Tropic of Capricorn", -23.44, "#8a6d1f"],
-      ["Antarctic Circle", -66.56, "#1d7fae"],
+      ["ring.arctic", 66.56, "#1d7fae"],
+      ["ring.cancer", 23.44, "#8a6d1f"],
+      ["ring.capricorn", -23.44, "#8a6d1f"],
+      ["ring.antarctic", -66.56, "#1d7fae"],
     ];
     const ctx = this.ctx;
-    for (const [name, lat, colour] of RINGS) {
+    for (const [key, lat, colour] of RINGS) {
       const pts = [];
       for (let lon = -180; lon <= 180; lon += 1) pts.push([lat, lon]);
       this._polyline(pts, { colour, width: 2.5, dash: [10, 5], casing: 3.5 });
@@ -288,8 +289,8 @@ export class ChartView {
       ctx.lineWidth = 3.5;
       ctx.strokeStyle = "rgba(255, 253, 248, 0.96)";
       ctx.fillStyle = colour;
-      ctx.strokeText(name, lx, ly);
-      ctx.fillText(name, lx, ly);
+      ctx.strokeText(t(key), lx, ly);
+      ctx.fillText(t(key), lx, ly);
       ctx.restore();
     }
   }
@@ -546,10 +547,8 @@ export class ChartView {
     ctx.fillStyle = colour;
     ctx.strokeStyle = "rgba(255,253,248,0.92)";
     ctx.lineWidth = 3.5;
-    const place = pt.lat <= -89.5 ? "the south pole"
-      : pt.lat >= 89.5 ? "the north pole"
-      : "one point";
-    const text = `${label} is ${place}, stretched by the projection into this whole circle`;
+    const place = t(pt.lat <= -89.5 ? "rim.south" : pt.lat >= 89.5 ? "rim.north" : "rim.point");
+    const text = t("rim.label", label, place);
     // Inside the rim: outside it the label falls on the vermilion hour ring,
     // where neither marker colour has any contrast.
     ctx.strokeText(text, cx, cy - r + 9);

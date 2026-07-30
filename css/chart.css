@@ -679,3 +679,29 @@ body.locked { overflow: hidden; }
 
 .doc h2:first-of-type { margin-top: 1.5rem; }
 
+
+/* ------------------------------------------------------ language switcher */
+
+.langs {
+  display: inline-flex;
+  margin-left: 0.6rem;
+  border: 1px solid var(--rule);
+}
+
+.langs button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--rule);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.32rem 0.5rem;
+  cursor: pointer;
+}
+
+.langs button:last-child { border-right: 0; }
+.langs button:hover { color: var(--ink); background: var(--sky-wash); }
+.langs button.on { background: var(--ink); color: var(--paper); }

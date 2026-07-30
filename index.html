@@ -14,19 +14,20 @@
     <img src="assets/ac_logo.png" width="320" height="320" alt="Aether Cosmology Research Group">
   </a>
   <div class="masthead-title">
-    <p class="presents">Aether Cosmology Research Group presents</p>
-    <h1>Gleason&rsquo;s Longitude and Time Calculator</h1>
-    <p class="sub">Gleason, A. (1892). <i>Gleason&rsquo;s new standard map of the world</i>. Buffalo Electrotype and Engraving Co. U.S. Patent No. 497,917, &ldquo;Time-Chart&rdquo; (1893).</p>
+    <p class="presents" data-i18n="site.presents">Aether Cosmology Research Group presents</p>
+    <h1 data-i18n="site.title">Gleason&rsquo;s Longitude and Time Calculator</h1>
+    <p class="sub" data-i18n="site.citation">Gleason, A. (1892). <i>Gleason&rsquo;s new standard map of the world</i>. Buffalo Electrotype and Engraving Co. U.S. Patent No. 497,917, &ldquo;Time-Chart&rdquo; (1893).</p>
   </div>
   <nav>
-    <a class="current" href="index.html">Chart</a>
-    <a href="about.html">About</a>
-    <a href="gallery.html">Sheets</a>
-    <a href="reference.html">Reference</a>
+    <a class="current" href="index.html" data-i18n="nav.chart">Chart</a>
+    <a href="about.html" data-i18n="nav.about">About</a>
+    <a href="gallery.html" data-i18n="nav.sheets">Sheets</a>
+    <a href="reference.html" data-i18n="nav.reference">Reference</a>
     <a class="discord" href="https://discord.gg/aethercosmology" target="_blank" rel="noopener"
-       aria-label="Aether Cosmology on Discord" title="Join us on Discord">
+       aria-label="Aether Cosmology on Discord" data-i18n="nav.discord" data-i18n-attr="title aria-label">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.317 4.369A19.79 19.79 0 0 0 15.432 3c-.21.375-.45.88-.617 1.283a18.4 18.4 0 0 0-5.628 0A12.6 12.6 0 0 0 8.56 3a19.74 19.74 0 0 0-4.886 1.372C.533 9.045-.32 13.58.108 18.057A19.9 19.9 0 0 0 6.15 21c.474-.646.897-1.333 1.26-2.055a12.9 12.9 0 0 1-1.986-.95c.166-.123.329-.251.486-.383a14.2 14.2 0 0 0 12.18 0c.159.135.322.263.486.383-.63.375-1.296.694-1.99.952.365.72.788 1.408 1.262 2.053a19.85 19.85 0 0 0 6.042-2.943c.5-5.177-.838-9.674-3.573-13.688ZM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.185 1.096 2.166 2.419 0 1.334-.964 2.419-2.166 2.419Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.185 1.096 2.166 2.419 0 1.334-.955 2.419-2.166 2.419Z"/></svg>
     </a>
+    <span class="langs" id="langs"></span>
   </nav>
 </header>
 
@@ -36,106 +37,106 @@
     <div class="side">
     <div class="stage-bar">
       <div class="seg" role="group" aria-label="Chart centre">
-        <button id="mode-printed" class="on" type="button">As printed</button>
-        <button id="mode-recentred" type="button">Recentred on A</button>
+        <button id="mode-printed" class="on" type="button" data-i18n="mode.printed">As printed</button>
+        <button id="mode-recentred" type="button" data-i18n="mode.recentred">Recentred on A</button>
       </div>
       <div class="seg" role="group" aria-label="Zoom">
-        <button id="fit-disc" class="on" type="button">Disc</button>
-        <button id="fit-sheet" type="button">Whole sheet</button>
+        <button id="fit-disc" class="on" type="button" data-i18n="zoom.disc">Disc</button>
+        <button id="fit-sheet" type="button" data-i18n="zoom.sheet">Whole sheet</button>
       </div>
       <div class="stage-tools">
-        <label><input type="checkbox" id="t-path" checked> Shortest path</label>
-        <label><input type="checkbox" id="t-ruler" checked> Straight ruler</label>
-        <label><input type="checkbox" id="t-grat"> Graticule</label>
-        <label><input type="checkbox" id="t-arms"> Ruler arms</label>
-        <label><input type="checkbox" id="t-rings"> Named circles</label>
+        <label><input type="checkbox" id="t-path" checked> <span data-i18n="toggle.path">Shortest path</span></label>
+        <label><input type="checkbox" id="t-ruler" checked> <span data-i18n="toggle.ruler">Straight ruler</span></label>
+        <label><input type="checkbox" id="t-grat"> <span data-i18n="toggle.graticule">Graticule</span></label>
+        <label><input type="checkbox" id="t-arms"> <span data-i18n="toggle.arms">Ruler arms</span></label>
+        <label><input type="checkbox" id="t-rings"> <span data-i18n="toggle.rings">Named circles</span></label>
       </div>
-      <p class="hint">Click to set <b>A</b>, click again to set <b>B</b>. Drag to pan, scroll to zoom. <b>Whole sheet</b> shows the printed rulers, the solstice diagrams and Gleason&rsquo;s own notes around the map.</p>
+      <p class="hint" data-i18n="chart.hint">Click to set <b>A</b>, click again to set <b>B</b>. Drag to pan, scroll to zoom. <b>Whole sheet</b> shows the printed rulers, the solstice diagrams and Gleason&rsquo;s own notes around the map.</p>
     </div>
 
       <section class="card lessons-card">
-        <h2>Worked examples</h2>
-        <p class="note">Each sets both points and the view, and names them in the A and B lists. Run them in order.</p>
+        <h2 data-i18n="lessons.heading">Worked examples</h2>
+        <p class="note" data-i18n="lessons.note">Each sets both points and the view, and names them in the A and B lists. Run them in order.</p>
         <ol class="lessons" id="lessons"></ol>
       </section>
     </div>
 
     <div class="canvas-wrap">
       <canvas id="chart" width="1000" height="1000"></canvas>
-      <div id="busy" class="busy" hidden>Replotting the engraving&hellip;</div>
+      <div id="busy" class="busy" hidden data-i18n="chart.busy">Replotting the engraving&hellip;</div>
     </div>
   </section>
 
   <aside class="panel">
 
     <section class="card">
-      <h2>Points</h2>
+      <h2 data-i18n="points.heading">Points</h2>
       <div class="pt" data-pt="A">
         <div class="pt-head"><span class="dot a"></span><b>A</b>
-          <select class="places" id="place-A"></select>
+          <select class="places" id="place-A" aria-label="A"></select>
         </div>
         <div class="pair">
-          <label>Lat <input type="number" id="lat-A" step="0.01" min="-90" max="90" value="51.47"></label>
-          <label>Lon <input type="number" id="lon-A" step="0.01" min="-180" max="180" value="-0.45"></label>
+          <label><span data-i18n="points.lat">Lat</span> <input type="number" id="lat-A" step="0.01" min="-90" max="90" value="51.47"></label>
+          <label><span data-i18n="points.lon">Lon</span> <input type="number" id="lon-A" step="0.01" min="-180" max="180" value="-0.45"></label>
         </div>
       </div>
       <div class="pt" data-pt="B">
         <div class="pt-head"><span class="dot b"></span><b>B</b>
-          <select class="places" id="place-B"></select>
+          <select class="places" id="place-B" aria-label="B"></select>
         </div>
         <div class="pair">
-          <label>Lat <input type="number" id="lat-B" step="0.01" min="-90" max="90" value="40.64"></label>
-          <label>Lon <input type="number" id="lon-B" step="0.01" min="-180" max="180" value="-73.78"></label>
+          <label><span data-i18n="points.lat">Lat</span> <input type="number" id="lat-B" step="0.01" min="-90" max="90" value="40.64"></label>
+          <label><span data-i18n="points.lon">Lon</span> <input type="number" id="lon-B" step="0.01" min="-180" max="180" value="-73.78"></label>
         </div>
       </div>
     </section>
 
     <section class="card accent">
-      <h2>Longitude and time</h2>
-      <p class="note">What the sheet is built to do. Its rim is divided into 24 hours, and it prints the rule directly: <i>degrees of longitude reduced to sun-time = 4 minutes</i>.</p>
+      <h2 data-i18n="time.heading">Longitude and time</h2>
+      <p class="note" data-i18n="time.note">What the sheet is built to do. Its rim is divided into 24 hours, and it prints the rule directly: <i>degrees of longitude reduced to sun-time = 4 minutes</i>.</p>
       <table class="read">
-        <tr><th>Difference of longitude</th><td id="r-dlon">&mdash;</td></tr>
-        <tr><th>Difference in sun time</th><td id="r-time" class="big">&mdash;</td></tr>
-        <tr><th>Local sun time at A</th><td id="r-sunA">&mdash;</td></tr>
-        <tr><th>Local sun time at B</th><td id="r-sunB">&mdash;</td></tr>
-        <tr><th>When it is noon at A, at B it is</th><td id="r-noon">&mdash;</td></tr>
+        <tr><th data-i18n="time.dlon">Difference of longitude</th><td id="r-dlon">&mdash;</td></tr>
+        <tr><th data-i18n="time.diff">Difference in sun time</th><td id="r-time" class="big">&mdash;</td></tr>
+        <tr><th data-i18n="time.sunA">Local sun time at A</th><td id="r-sunA">&mdash;</td></tr>
+        <tr><th data-i18n="time.sunB">Local sun time at B</th><td id="r-sunB">&mdash;</td></tr>
+        <tr><th data-i18n="time.noon">When it is noon at A, at B it is</th><td id="r-noon">&mdash;</td></tr>
       </table>
       <div class="eq" id="eq-time"></div>
     </section>
 
     <section class="card">
-      <h2>Distance</h2>
-      <p class="note">Worked from the chart&rsquo;s own output. The difference in sun time is an angle at 15&deg; to the hour. Taken with the two latitudes it gives the angle between the two places, and Gleason&rsquo;s sixty geographical miles to the degree turns that into a distance. Haversine is used to verify the consistency of the time conversion to geographical miles. A straight ruler laid across the chart is not this, because a line that misses the centre is not on a radial.</p>
+      <h2 data-i18n="dist.heading">Distance</h2>
+      <p class="note" data-i18n="dist.note">Worked from the chart&rsquo;s own output. The difference in sun time is an angle at 15&deg; to the hour. Taken with the two latitudes it gives the angle between the two places, and Gleason&rsquo;s sixty geographical miles to the degree turns that into a distance. Haversine is used to verify the consistency of the time conversion to geographical miles. A straight ruler laid across the chart is not this, because a line that misses the centre is not on a radial.</p>
       <table class="read">
-        <tr><th>Distance <span class="tag">from the time</span></th><td id="r-gle" class="big">&mdash;</td></tr>
+        <tr><th><span data-i18n="dist.fromTime">Distance</span> <span class="tag" data-i18n="dist.tagFromTime">from the time</span></th><td id="r-gle" class="big">&mdash;</td></tr>
         <tr><td colspan="2" id="r-gle-alt" class="muted alt">&mdash;</td></tr>
-        <tr><th>Difference of longitude, as an angle</th><td id="r-ns">&mdash;</td></tr>
-        <tr><th>Angle between the two places</th><td id="r-ew">&mdash;</td></tr>
-        <tr class="rule"><th>Straight ruler on the chart</th><td id="r-ruler">&mdash;</td></tr>
+        <tr><th data-i18n="dist.dlonAngle">Difference of longitude, as an angle</th><td id="r-ns">&mdash;</td></tr>
+        <tr><th data-i18n="dist.between">Angle between the two places</th><td id="r-ew">&mdash;</td></tr>
+        <tr class="rule"><th data-i18n="dist.ruler">Straight ruler on the chart</th><td id="r-ruler">&mdash;</td></tr>
         <tr><td colspan="2" id="r-ruler-alt" class="muted alt">&mdash;</td></tr>
-        <tr><th>Ruler against the chart&rsquo;s figure</th><td id="r-err" class="warn">&mdash;</td></tr>
+        <tr><th data-i18n="dist.rulerVs">Ruler against the chart&rsquo;s figure</th><td id="r-err" class="warn">&mdash;</td></tr>
         <tr><td colspan="2" id="r-err-alt" class="warn sub alt">&mdash;</td></tr>
-        <tr class="rule"><th>Haversine <span class="tag">check</span></th><td id="r-true">&mdash;</td></tr>
+        <tr class="rule"><th><span data-i18n="dist.haversine">Haversine</span> <span class="tag" data-i18n="dist.tagCheck">check</span></th><td id="r-true">&mdash;</td></tr>
         <tr><td colspan="2" id="r-true-alt" class="muted alt">&mdash;</td></tr>
-        <tr><th>Agreement</th><td id="r-gc-diff">&mdash;</td></tr>
-        <tr class="rule"><th>Along the parallel of A, Fig. 43</th><td id="r-par">&mdash;</td></tr>
-        <tr><th>Radial from the pole, A / B</th><td id="r-rad">&mdash;</td></tr>
+        <tr><th data-i18n="dist.agreement">Agreement</th><td id="r-gc-diff">&mdash;</td></tr>
+        <tr class="rule"><th data-i18n="dist.parallel">Along the parallel of A, Fig. 43</th><td id="r-par">&mdash;</td></tr>
+        <tr><th data-i18n="dist.radial">Radial from the pole, A / B</th><td id="r-rad">&mdash;</td></tr>
       </table>
       <div class="eq" id="eq-dist"></div>
       <p id="r-note" class="note tight"></p>
     </section>
 
     <section class="card">
-      <h2>Gleason&rsquo;s printed scales</h2>
-      <p class="note">The sheet carries its own rulers along the foot: English against nautical miles, and minutes and degrees of longitude against sun time.</p>
+      <h2 data-i18n="scales.heading">Gleason&rsquo;s printed scales</h2>
+      <p class="note" data-i18n="scales.note">The sheet carries its own rulers along the foot: English against nautical miles, and minutes and degrees of longitude against sun time.</p>
       <a href="assets/rulers.jpg" target="_blank" rel="noopener">
-        <img class="strip" src="assets/rulers.jpg" alt="The scale rulers printed along the foot of the 1892 sheet">
+        <img class="strip" src="assets/rulers.jpg" data-i18n="scales.alt" data-i18n-attr="alt" alt="The scale rulers printed along the foot of the 1892 sheet">
       </a>
       <table class="read">
-        <tr><th>&Delta; longitude in minutes of arc</th><td id="r-arcmin">&mdash;</td></tr>
-        <tr><th>Read as sun time</th><td id="r-scale-time">&mdash;</td></tr>
-        <tr><th>Geographical miles at the equator</th><td id="r-geo">&mdash;</td></tr>
-        <tr><th>English miles at the equator</th><td id="r-eng">&mdash;</td></tr>
+        <tr><th data-i18n="scales.arcmin">&Delta; longitude in minutes of arc</th><td id="r-arcmin">&mdash;</td></tr>
+        <tr><th data-i18n="scales.time">Read as sun time</th><td id="r-scale-time">&mdash;</td></tr>
+        <tr><th data-i18n="scales.geo">Geographical miles at the equator</th><td id="r-geo">&mdash;</td></tr>
+        <tr><th data-i18n="scales.eng">English miles at the equator</th><td id="r-eng">&mdash;</td></tr>
       </table>
       <div class="eq" id="eq-scale"></div>
     </section>
@@ -144,7 +145,7 @@
 </main>
 
 <footer class="foot">
-  <p>Base image: <i>Gleason&rsquo;s new standard map of the world</i>, Alexander Gleason, Buffalo Electrotype and Engraving Co., 1892; this copy reprinted by Lone Star Art, 2013. American Geographical Society Library, University of Wisconsin&ndash;Milwaukee. The reprint is used because it carries no indicating arm across the map; the 1892 impression held by the Boston Public Library is shown on the <a href="reference.html">reference page</a>.</p>
+  <p data-i18n="foot.base">Base image: <i>Gleason&rsquo;s new standard map of the world</i>, Alexander Gleason, Buffalo Electrotype and Engraving Co., 1892; this copy reprinted by Lone Star Art, 2013. American Geographical Society Library, University of Wisconsin&ndash;Milwaukee. The reprint is used because it carries no indicating arm across the map; the 1892 impression held by the Boston Public Library is shown on the <a href="reference.html">reference page</a>.</p>
   <p id="georef" class="muted"></p>
 </footer>
 

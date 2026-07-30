@@ -14,39 +14,44 @@
     <img src="assets/ac_logo.png" width="320" height="320" alt="Aether Cosmology Research Group">
   </a>
   <div class="masthead-title">
-    <p class="presents">Aether Cosmology Research Group presents</p>
-    <h1>Gleason&rsquo;s Longitude and Time Calculator</h1>
-    <p class="sub">Gleason, A. (1892). <i>Gleason&rsquo;s new standard map of the world</i>. Buffalo Electrotype and Engraving Co. U.S. Patent No. 497,917, &ldquo;Time-Chart&rdquo; (1893).</p>
+    <p class="presents" data-i18n="site.presents">Aether Cosmology Research Group presents</p>
+    <h1 data-i18n="site.title">Gleason&rsquo;s Longitude and Time Calculator</h1>
+    <p class="sub" data-i18n="site.citation">Gleason, A. (1892). <i>Gleason&rsquo;s new standard map of the world</i>. Buffalo Electrotype and Engraving Co. U.S. Patent No. 497,917, &ldquo;Time-Chart&rdquo; (1893).</p>
   </div>
   <nav>
-    <a href="index.html">Chart</a>
-    <a href="about.html">About</a>
-    <a class="current" href="gallery.html">Sheets</a>
-    <a href="reference.html">Reference</a>
+    <a href="index.html" data-i18n="nav.chart">Chart</a>
+    <a href="about.html" data-i18n="nav.about">About</a>
+    <a class="current" href="gallery.html" data-i18n="nav.sheets">Sheets</a>
+    <a href="reference.html" data-i18n="nav.reference">Reference</a>
     <a class="discord" href="https://discord.gg/aethercosmology" target="_blank" rel="noopener"
-       aria-label="Aether Cosmology on Discord" title="Join us on Discord">
+       aria-label="Aether Cosmology on Discord" data-i18n="nav.discord" data-i18n-attr="title aria-label">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.317 4.369A19.79 19.79 0 0 0 15.432 3c-.21.375-.45.88-.617 1.283a18.4 18.4 0 0 0-5.628 0A12.6 12.6 0 0 0 8.56 3a19.74 19.74 0 0 0-4.886 1.372C.533 9.045-.32 13.58.108 18.057A19.9 19.9 0 0 0 6.15 21c.474-.646.897-1.333 1.26-2.055a12.9 12.9 0 0 1-1.986-.95c.166-.123.329-.251.486-.383a14.2 14.2 0 0 0 12.18 0c.159.135.322.263.486.383-.63.375-1.296.694-1.99.952.365.72.788 1.408 1.262 2.053a19.85 19.85 0 0 0 6.042-2.943c.5-5.177-.838-9.674-3.573-13.688ZM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.185 1.096 2.166 2.419 0 1.334-.964 2.419-2.166 2.419Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.185 1.096 2.166 2.419 0 1.334-.955 2.419-2.166 2.419Z"/></svg>
     </a>
+    <span class="langs" id="langs"></span>
   </nav>
 </header>
 
 <article class="doc wide">
 
-<h2 class="page-name">The sheets</h2>
+<h2 class="page-name" data-i18n="gallery.pagename">The sheets</h2>
 
-<p>The map disc is only the middle of the sheet. Around it Gleason printed the title block, the twenty-four hour dial, two scale rulers, a pair of solstice diagrams and several paragraphs of instruction. These are the copies consulted, reproduced whole. Click any sheet to enlarge it here, and click again to close it.</p>
+<p data-i18n="gallery.lead">The map disc is only the middle of the sheet. Around it Gleason printed the title block, the twenty-four hour dial, two scale rulers, a pair of solstice diagrams and several paragraphs of instruction. These are the copies consulted, reproduced whole. Click any sheet to enlarge it here, and click again to close it.</p>
 
-<p class="note">Shown for what is printed on them, not measured on. Only the reprint on the <a href="index.html">chart page</a> is georeferenced.</p>
+<p class="note" data-i18n="gallery.note">Shown for what is printed on them, not measured on. Only the reprint on the <a href="index.html">chart page</a> is georeferenced.</p>
 
 <div id="sheets"></div>
 
 </article>
 
 <footer class="foot">
-  <p>The 1892 work carries no known copyright restrictions. Each copy is credited to its holding institution above.</p>
+  <p data-i18n="gallery.foot">The 1892 work carries no known copyright restrictions. Each copy is credited to its holding institution above.</p>
 </footer>
 
 <script type="module">
+import { bootPage } from "./js/page.js";
+import { t } from "./js/i18n.js";
+await bootPage();
+
 const res = await fetch("assets/gallery.json");
 const { sheets } = await res.json();
 const host = document.getElementById("sheets");
@@ -58,26 +63,26 @@ for (const s of sheets) {
   const a = document.createElement("button");
   a.type = "button";
   a.className = "sheet-open";
-  a.setAttribute("aria-label", `Enlarge ${s.label}`);
+  a.setAttribute("aria-label", t(`gallery.${s.id}.label`));
 
   const img = document.createElement("img");
   img.src = s.image;
   img.width = s.width;
   img.height = s.height;
   img.loading = "lazy";
-  img.alt = `${s.label}, the whole sheet`;
+  img.alt = t(`gallery.${s.id}.label`);
   a.append(img);
-  a.addEventListener("click", () => openSheet(s.image, img.alt, s.label));
+  a.addEventListener("click", () => openSheet(s.image, img.alt, t(`gallery.${s.id}.label`)));
   a.id = `sheet-${s.id}`;
 
   const cap = document.createElement("figcaption");
   const h = document.createElement("b");
-  h.textContent = s.label;
+  h.textContent = t(`gallery.${s.id}.label`);
   const note = document.createElement("p");
-  note.textContent = s.note;
+  note.textContent = t(`gallery.${s.id}.note`);
   const cred = document.createElement("p");
   cred.className = "cred";
-  cred.textContent = `${s.holding} · scanned at ${s.scan_px[0]} × ${s.scan_px[1]} px`;
+  cred.textContent = `${s.holding} · ${t("gallery.scanned")} ${s.scan_px[0]} × ${s.scan_px[1]} px`;
   cap.append(h, note, cred);
 
   fig.append(a, cap);
@@ -100,7 +105,7 @@ document.body.append(box);
 function openSheet(src, alt, label) {
   big.src = src;
   big.alt = alt;
-  bar.textContent = `${label} \u00b7 click anywhere to close`;
+  bar.textContent = `${label} \u00b7 ${t("gallery.close")}`;
   box.hidden = false;
   box.scrollTop = 0;
   document.body.classList.add("locked");

@@ -14,25 +14,28 @@
     <img src="assets/ac_logo.png" width="320" height="320" alt="Aether Cosmology Research Group">
   </a>
   <div class="masthead-title">
-    <p class="presents">Aether Cosmology Research Group presents</p>
-    <h1>Gleason&rsquo;s Longitude and Time Calculator</h1>
-    <p class="sub">Gleason, A. (1892). <i>Gleason&rsquo;s new standard map of the world</i>. Buffalo Electrotype and Engraving Co. U.S. Patent No. 497,917, &ldquo;Time-Chart&rdquo; (1893).</p>
+    <p class="presents" data-i18n="site.presents">Aether Cosmology Research Group presents</p>
+    <h1 data-i18n="site.title">Gleason&rsquo;s Longitude and Time Calculator</h1>
+    <p class="sub" data-i18n="site.citation">Gleason, A. (1892). <i>Gleason&rsquo;s new standard map of the world</i>. Buffalo Electrotype and Engraving Co. U.S. Patent No. 497,917, &ldquo;Time-Chart&rdquo; (1893).</p>
   </div>
   <nav>
-    <a href="index.html">Chart</a>
-    <a href="about.html">About</a>
-    <a href="gallery.html">Sheets</a>
-    <a class="current" href="reference.html">Reference</a>
+    <a href="index.html" data-i18n="nav.chart">Chart</a>
+    <a href="about.html" data-i18n="nav.about">About</a>
+    <a href="gallery.html" data-i18n="nav.sheets">Sheets</a>
+    <a class="current" href="reference.html" data-i18n="nav.reference">Reference</a>
     <a class="discord" href="https://discord.gg/aethercosmology" target="_blank" rel="noopener"
-       aria-label="Aether Cosmology on Discord" title="Join us on Discord">
+       aria-label="Aether Cosmology on Discord" data-i18n="nav.discord" data-i18n-attr="title aria-label">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.317 4.369A19.79 19.79 0 0 0 15.432 3c-.21.375-.45.88-.617 1.283a18.4 18.4 0 0 0-5.628 0A12.6 12.6 0 0 0 8.56 3a19.74 19.74 0 0 0-4.886 1.372C.533 9.045-.32 13.58.108 18.057A19.9 19.9 0 0 0 6.15 21c.474-.646.897-1.333 1.26-2.055a12.9 12.9 0 0 1-1.986-.95c.166-.123.329-.251.486-.383a14.2 14.2 0 0 0 12.18 0c.159.135.322.263.486.383-.63.375-1.296.694-1.99.952.365.72.788 1.408 1.262 2.053a19.85 19.85 0 0 0 6.042-2.943c.5-5.177-.838-9.674-3.573-13.688ZM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.185 1.096 2.166 2.419 0 1.334-.964 2.419-2.166 2.419Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.185 1.096 2.166 2.419 0 1.334-.955 2.419-2.166 2.419Z"/></svg>
     </a>
+    <span class="langs" id="langs"></span>
   </nav>
 </header>
 
 <article class="doc">
 
-<h2 class="page-name">Reference</h2>
+<p class="note" data-i18n="ref.quoteNote">Quotations are given in the original English, as they are the primary source. The surrounding text is translated.</p>
+
+<h2 class="page-name" data-i18n="ref.pagename">Reference</h2>
 
 <h2>The sheet</h2>
 
@@ -131,7 +134,7 @@
 <p>The table he prints beneath it, headed <i>Comparison, for a difference of</i>:</p>
 
 <table>
-  <tr><th>Longitude</th><th>Time</th><th>Distance</th></tr>
+  <tr><th>Longitude</th><th>Time</th><th data-i18n="dist.heading">Distance</th></tr>
   <tr><td>15&deg;</td><td>1 hour</td><td>900 longitude miles</td></tr>
   <tr><td>15&prime; arc</td><td>1 minute</td><td>15 miles</td></tr>
   <tr><td>15&Prime;</td><td>1 second</td><td>1/60 of 15</td></tr>
@@ -170,7 +173,7 @@
 <p>Neither of the above applies, and a straight edge is measuring a chord across a projection that does not preserve straight-line distance away from its centre. Two ways to get it right:</p>
 <ul>
   <li>Compute the angle between the two places through the graticule and take it at 60 geographical miles to the degree, which is what the <i>shortest distance</i> readout on the chart page does.</li>
-  <li>Recentre the projection on one of the two places. The line to the other is then a radial, and a straight edge reads correctly along it. This is what the <i>Recentred on A</i> view does: the same engraving, replotted about a different centre.</li>
+  <li>Recentre the projection on one of the two places. The line to the other is then a radial, and a straight edge reads correctly along it. This is what the <i data-i18n="mode.recentred">Recentred on A</i> view does: the same engraving, replotted about a different centre.</li>
 </ul>
 
 <p>This is not a peculiarity of this sheet. It is true of every azimuthal equidistant map ever drawn, and it is why polar route charts are recentred on the departure point rather than measured across.</p>
@@ -188,8 +191,14 @@
 </article>
 
 <footer class="foot">
-  <p>Quotations are transcribed from the patent text and from the 1893 printing. Spelling and punctuation are as they appear in the originals.</p>
+  <p data-i18n="ref.foot">Quotations are transcribed from the patent text and from the 1893 printing. Spelling and punctuation are as they appear in the originals.</p>
 </footer>
+
+
+<script type="module">
+import { bootPage } from "./js/page.js";
+await bootPage();
+</script>
 
 </body>
 </html>

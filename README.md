@@ -29,6 +29,11 @@ node js/test.js                 # coordinate maths self-check
 | Worked examples | Seven presets covering the radial case, the off-centre case, recentring and why it works, the cosine of latitude, and the pole drawn as the rim |
 | Whole sheet | The full sheet, with the title block, hour dial legend, scale rulers, solstice diagrams and Gleason's printed notes |
 
+The whole site is available in English, Czech and Slovak. The switcher sits in
+the masthead, the choice is remembered, and it travels on links and in the
+address bar as `?lang=cs`. Verbatim quotations from the 1893 book and the patent
+stay in the original English, since they are the primary source.
+
 Points are set by clicking the chart, by name, or by typing coordinates. The
 address bar carries the current measurement, so a particular case can be linked
 to: `?a=-33.95,151.18&b=-33.40,-70.79&mode=recentred&zoom=sheet`.
@@ -98,6 +103,9 @@ js/geo.js           projection, spherical geometry, recentring, conversions
 js/chart.js         canvas view, pan and zoom, raster reprojection
 js/app.js           wiring and readouts
 js/test.js          self-check, no framework
+js/i18n.js          translation loader and language switcher
+js/page.js          shared boot for the text-only pages
+i18n/               en, cs and sk dictionaries
 tools/              one-time asset and georeference scripts (Python)
 assets/             chart image, georeference, extracted sheet details
 ```

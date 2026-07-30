@@ -1,4 +1,5 @@
 import { ChartView } from "./chart.js";
+import { t, pickLang, loadLang, applyTranslations, buildSwitcher } from "./i18n.js";
 import {
   trueNM, rulerNM, alongParallelNM, timeFromLongitude, formatHM,
   formatLat, formatLon, nmToKm, nmToStatute, sunTimeAt, deltaLon,
@@ -6,97 +7,49 @@ import {
   MINUTES_PER_DEGREE_LON,
 } from "./geo.js";
 
-const PLACES = [
-  ["Greenwich", 51.4779, -0.0015],
-  ["London Heathrow", 51.4700, -0.4543],
-  ["New York JFK", 40.6413, -73.7781],
-  ["Los Angeles", 33.9416, -118.4085],
-  ["Panama", 8.9824, -79.5199],
-  ["Rio de Janeiro", -22.9068, -43.1729],
-  ["Santiago", -33.3973, -70.7938],
-  ["Cape Horn", -55.9833, -67.2667],
-  ["Reykjavik", 64.1466, -21.9426],
-  ["Cape Town", -33.9249, 18.4241],
-  ["Johannesburg", -26.1394, 28.2468],
-  ["Cairo", 30.0444, 31.2357],
-  ["Moscow", 55.7558, 37.6173],
-  ["Mumbai", 19.0760, 72.8777],
-  ["Singapore", 1.3521, 103.8198],
-  ["Hong Kong", 22.3193, 114.1694],
-  ["Tokyo", 35.5533, 139.7811],
-  ["Perth", -31.9385, 115.9672],
-  ["Sydney", -33.9500, 151.1817],
-  ["Auckland", -37.0089, 174.7864],
-  ["North Pole", 90, 0],
-  ["South Pole", -90, 0],
+// Coordinates here, names from the dictionary.
+const PLACE_KEYS = [
+  ["greenwich", 51.4779, -0.0015],
+  ["london", 51.4700, -0.4543],
+  ["newyork", 40.6413, -73.7781],
+  ["losangeles", 33.9416, -118.4085],
+  ["panama", 8.9824, -79.5199],
+  ["rio", -22.9068, -43.1729],
+  ["santiago", -33.3973, -70.7938],
+  ["capehorn", -55.9833, -67.2667],
+  ["reykjavik", 64.1466, -21.9426],
+  ["capetown", -33.9249, 18.4241],
+  ["johannesburg", -26.1394, 28.2468],
+  ["cairo", 30.0444, 31.2357],
+  ["moscow", 55.7558, 37.6173],
+  ["mumbai", 19.0760, 72.8777],
+  ["singapore", 1.3521, 103.8198],
+  ["hongkong", 22.3193, 114.1694],
+  ["tokyo", 35.5533, 139.7811],
+  ["perth", -31.9385, 115.9672],
+  ["sydney", -33.9500, 151.1817],
+  ["auckland", -37.0089, 174.7864],
+  ["northpole", 90, 0],
+  ["southpole", -90, 0],
 ];
 
 const LESSONS = [
-  {
-    title: "Longitude into time",
-    body: "Greenwich to New York. Read the difference of longitude, then take it at four minutes to the degree. This is the calculation the sheet was patented for.",
-    A: "Greenwich", B: "New York JFK", mode: "printed",
-  },
-  {
-    title: "The radial is exact",
-    body: "Pole to Singapore. The line runs straight out from the centre, so it lies along a radial and the ruler reads the scale correctly. Ruler and shortest distance agree exactly.",
-    A: "North Pole", B: "Singapore", mode: "printed",
-  },
-  {
-    title: "The ruler off to one side",
-    body: "Sydney to Santiago on the chart as printed. The straight line never comes near the centre, so it is not on a radial and the reading is far out.",
-    A: "Sydney", B: "Santiago", mode: "printed",
-  },
-  {
-    title: "Recentre, and the ruler is true",
-    body: "The same two places, the same engraving, replotted about Sydney. Now the line to Santiago is a radial, and the ruler reads correctly.",
-    A: "Sydney", B: "Santiago", mode: "recentred",
-  },
-  {
-    title: "Why recentring works",
-    body: "The same Sydney to Santiago measurement, recentred. Read this one alongside the chart.",
-    A: "Sydney", B: "Santiago", mode: "recentred",
-    detail: [
-      "Equidistant is a real guarantee, but a narrow one. On this projection distances are true only along straight lines running outward from the centre. Nowhere else.",
-      "Gleason put the centre at the north pole. So a straight edge from the pole to anywhere reads correctly. So do any two places on one meridian, because that line passes through the centre on its way.",
-      "Sydney to Santiago never comes near the centre. That is why the ruler there overstates the distance by more than double.",
-      "Here is the part that does the work: the centre is not a property of the world. It is a choice made when the projection is drawn. Gleason chose the pole. Nothing stops you choosing Sydney.",
-      "Recentring takes the same engraving, the same ink, and asks where each piece of it lands if Sydney is the centre instead. Sydney is then in the middle, the line out to Santiago runs straight out from the centre, and the guarantee applies to it. The ruler reads 6,118 n.m., which is right.",
-      "The straight line started working because the one place the projection can be trusted was moved to the place being measured from. Nothing was corrected on the map.",
-      "The same limit still applies, one step along: this view is true from A only. Measure between two other points on it and you are reading a chord again.",
-      "None of this is a workaround. Polar route charts are recentred on the departure airport for exactly this reason, and the pivot at the centre of Gleason's own sheet is there because every operation his patent describes is an angular one taken about that point.",
-    ],
-  },
-  {
-    title: "A degree of longitude is not a fixed distance",
-    body: "Cape Town and Sydney sit almost on the same parallel. A degree of longitude between them is still four minutes of sun time, the same as anywhere. It is not 60 miles. At 34 degrees south it is about 50. Gleason tabulates that shrinkage in his Fig. 43.",
-    A: "Cape Town", B: "Sydney", mode: "printed",
-  },
-  {
-    title: "One point, stretched into a circle",
-    body: "North pole to south pole. Look at how B is drawn.",
-    A: "North Pole", B: "South Pole", mode: "printed",
-    detail: [
-      "The projection keeps the north pole as a point. So A is a dot at the centre.",
-      "It does not keep the south pole as a point. It stretches it. So B is the dashed circle around the rim.",
-      "That circle is not a route to B. It is B.",
-      "One dot on a globe projection, one whole circle on this one. Same place, laid out two different ways.",
-      "Every projection has to open the surface up somewhere. This one keeps the north pole whole. The cost lands on the opposite point, and the south pole gets pulled out into the entire boundary. Nothing is hidden and nothing is invented. It is stretched.",
-      "Every part of that ring is the south pole. All of it, equally. The marker on it is just a handle, so there is something to click and something for the ruler to reach. It could sit anywhere on the ring, so it is put on the other point's meridian.",
-      "The numbers are still exact. Pole to pole is 10,800 nautical miles: 180 degrees at sixty miles to the degree. The straight ruler agrees exactly, because that line is a meridian, and a meridian is a radial.",
-      "This also explains the blank ring at the edge of the sheet. Antarctica is not missing because nobody had been there. A continent that wraps around the south pole gets stretched the way the pole does, smeared along the whole rim, at a scale that grows without limit as you get closer.",
-      "Switch to Recentred on A and it mirrors. The south pole becomes the centre. The north pole becomes the rim.",
-      "No projection escapes this. Mercator does it to both poles at once, stretching each into the full width of the map, top and bottom. That is why Greenland comes out looking the size of Africa on it. Every map projection is a set of choices about where to put the stretching.",
-    ],
-  },
+  { id: "l1", A: "greenwich", B: "newyork", mode: "printed" },
+  { id: "l2", A: "northpole", B: "singapore", mode: "printed" },
+  { id: "l3", A: "sydney", B: "santiago", mode: "printed" },
+  { id: "l4", A: "sydney", B: "santiago", mode: "recentred" },
+  { id: "l5", A: "sydney", B: "santiago", mode: "recentred", details: 8 },
+  { id: "l6", A: "capetown", B: "sydney", mode: "printed" },
+  { id: "l7", A: "northpole", B: "southpole", mode: "printed", details: 10 },
 ];
+
 
 const $ = (id) => document.getElementById(id);
 
 // Named places, keyed for the lessons. The value string matches the option
 // value built for the selectors below, so setting one syncs the other.
 const PLACE_INDEX = new Map(
-  PLACES.map(([name, lat, lon]) => [name, { lat, lon, value: `${lat},${lon}` }]),
+  PLACE_KEYS.map(([key, lat, lon]) => [key, { lat, lon, value: `${lat},${lon}` }]),
 );
 
 // Captured before anything runs: writeUrl() rewrites the query string during
@@ -112,6 +65,9 @@ const state = {
 
 // ------------------------------------------------------------------ setup
 
+await loadLang(pickLang());
+applyTranslations();
+
 const meta = await fetch("assets/chart.json").then((r) => r.json());
 const image = await new Promise((res, rej) => {
   const im = new Image();
@@ -126,19 +82,56 @@ const view = new ChartView(canvas, meta.chart, image);
 state.view = view;
 view.points = state;
 
-$("georef").textContent =
-  `Georeferenced to the scan by coastline fit: centre ${meta.chart.center_px[0].toFixed(1)}, `
-  + `${meta.chart.center_px[1].toFixed(1)} px, ${meta.chart.px_per_degree.toFixed(4)} px per degree of `
-  + `colatitude, Greenwich at ${meta.chart.meridian_rotation_deg.toFixed(2)}° from image north, `
-  + `land and sea agreeing over ${(meta.chart.coastline_agreement * 100).toFixed(1)}% of the disc.`;
+function fillGeoref() {
+  $("georef").textContent = t("foot.georef",
+    meta.chart.center_px[0].toFixed(1), meta.chart.center_px[1].toFixed(1),
+    meta.chart.px_per_degree.toFixed(4), meta.chart.meridian_rotation_deg.toFixed(2),
+    (meta.chart.coastline_agreement * 100).toFixed(1));
+}
+fillGeoref();
+
+// Switching language rebuilds every string the app generates, then redraws.
+async function switchLang(code) {
+  await loadLang(code);
+  applyTranslations();
+  fillGeoref();
+  rebuildSelectors();
+  rebuildLessons();
+  buildSwitcher($("langs"), switchLang);
+  for (const a of document.querySelectorAll('a[href$=".html"]')) {
+    const u = new URL(a.getAttribute("href"), location.href);
+    u.searchParams.set("lang", code);
+    a.setAttribute("href", u.pathname.split("/").pop() + u.search);
+  }
+  const q = new URLSearchParams(location.search);
+  q.set("lang", code);
+  history.replaceState(null, "", `?${q}`);
+  refresh();
+}
+
+buildSwitcher($("langs"), switchLang);
+
+// Option text comes from the dictionary, so it is rebuilt on a language change.
+// The listener is attached once, separately.
+function rebuildSelectors() {
+  for (const id of ["place-A", "place-B"]) {
+    const sel = $(id);
+    const keep = sel.value;
+    sel.innerHTML = "";
+    sel.append(new Option(t("points.placeholder"), ""));
+    for (const [key, lat, lon] of PLACE_KEYS) {
+      sel.append(new Option(t(`place.${key}`), `${lat},${lon}`));
+    }
+    sel.value = keep;
+  }
+}
+
+rebuildSelectors();
 
 for (const id of ["place-A", "place-B"]) {
-  const sel = $(id);
-  sel.append(new Option("Set by hand or by clicking", ""));
-  for (const [name, lat, lon] of PLACES) sel.append(new Option(name, `${lat},${lon}`));
-  sel.addEventListener("change", () => {
-    if (!sel.value) return;
-    const [lat, lon] = sel.value.split(",").map(Number);
+  $(id).addEventListener("change", (e) => {
+    if (!e.target.value) return;
+    const [lat, lon] = e.target.value.split(",").map(Number);
     setPoint(id.endsWith("A") ? "A" : "B", lat, lon);
   });
 }
@@ -177,46 +170,54 @@ $("mode-printed").addEventListener("click", () => setMode("printed"));
 $("mode-recentred").addEventListener("click", () => setMode("recentred"));
 
 const lessonList = $("lessons");
-LESSONS.forEach((l) => {
-  const li = document.createElement("li");
-  const b = document.createElement("button");
-  b.type = "button";
-  b.textContent = l.title;
 
-  const p = document.createElement("p");
-  p.textContent = l.body;
-  li.append(b, p);
+function rebuildLessons() {
+    const openId = lessonList.querySelector("li.on")?.dataset.lesson;
+    lessonList.innerHTML = "";
+    LESSONS.forEach((l) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = t(`${l.id}.title`);
 
-  // Longer lessons keep their text folded away until the lesson is run, so the
-  // list stays a list rather than an essay.
-  let detail = null;
-  if (l.detail) {
-    detail = document.createElement("div");
-    detail.className = "detail";
-    detail.hidden = true;
-    for (const para of l.detail) {
-      const d = document.createElement("p");
-      d.textContent = para;
-      detail.append(d);
+    const p = document.createElement("p");
+    p.textContent = t(`${l.id}.body`);
+    li.append(b, p);
+
+    // Longer lessons keep their text folded away until the lesson is run, so the
+    // list stays a list rather than an essay.
+    let detail = null;
+    if (l.details) {
+      detail = document.createElement("div");
+      detail.className = "detail";
+      detail.hidden = true;
+      for (let i = 1; i <= l.details; i++) {
+        const d = document.createElement("p");
+        d.textContent = t(`${l.id}.d${i}`);
+        detail.append(d);
+      }
+      li.append(detail);
     }
-    li.append(detail);
-  }
 
-  b.addEventListener("click", () => {
-    setPlace("A", l.A);
-    setPlace("B", l.B);
-    for (const other of lessonList.children) {
-      other.classList.toggle("on", other === li);
-      const d = other.querySelector(".detail");
-      if (d) d.hidden = other !== li;
-    }
-    setMode(l.mode);
+    b.addEventListener("click", () => {
+      setPlace("A", l.A);
+      setPlace("B", l.B);
+      for (const other of lessonList.children) {
+        other.classList.toggle("on", other === li);
+        const d = other.querySelector(".detail");
+        if (d) d.hidden = other !== li;
+      }
+      setMode(l.mode);
+    });
+
+    li.dataset.lesson = String(lessonList.children.length + 1);
+    b.id = `lesson-${lessonList.children.length + 1}`;
+    lessonList.append(li);
+    if (li.dataset.lesson === openId) b.click();
   });
+}
 
-  li.dataset.lesson = String(lessonList.children.length + 1);
-  b.id = `lesson-${lessonList.children.length + 1}`;
-  lessonList.append(li);
-});
+rebuildLessons();
 
 // A lesson can be linked to directly, e.g. #lesson-5
 function runHashLesson(hash = location.hash) {
@@ -401,9 +402,7 @@ function setMode(mode) {
   // longer the pole, so there is nothing for them to read.
   const arms = $("t-arms");
   arms.disabled = mode !== "printed";
-  arms.parentElement.title = arms.disabled
-    ? "The arms read longitude about the pole, so they apply to the printed chart only"
-    : "Two arms pivoted at the pole, reading the angle between the two meridians";
+  arms.parentElement.title = t(arms.disabled ? "arms.title.off" : "arms.title.on");
   if (mode === "printed") {
     view.showPrinted();
     refresh();
@@ -442,7 +441,7 @@ function readouts() {
   const { A, B } = state;
   const { dlon, minutes } = timeFromLongitude(A.lon, B.lon);
 
-  $("r-dlon").textContent = `${Math.abs(dlon).toFixed(2)}° ${dlon >= 0 ? "east" : "west"}`;
+  $("r-dlon").textContent = `${Math.abs(dlon).toFixed(2)}° ${dlon >= 0 ? t("unit.east") : t("unit.west")}`;
   $("r-time").textContent = formatHM(minutes);
   $("r-sunA").textContent = `${sunTimeAt(A.lon)}  (${formatLon(A.lon)})`;
   $("r-sunB").textContent = `${sunTimeAt(B.lon)}  (${formatLon(B.lon)})`;
@@ -457,18 +456,18 @@ function readouts() {
   const [bx, by] = view.pixelOf(B, A);
   const ruler = rulerNM(ax, ay, bx, by, view.proj.k);
 
-  $("r-gle").textContent = `${fmt(G.nm)} n.m.`;
+  $("r-gle").textContent = `${fmt(G.nm)} ${t("unit.nm")}`;
   $("r-gle-alt").textContent = units(G.nm);
   $("r-ns").textContent = `${G.dlon.toFixed(2)}°`;
   $("r-ew").textContent = `${G.sigma.toFixed(3)}°`;
-  $("r-true").textContent = `${fmt(truth)} n.m.`;
+  $("r-true").textContent = `${fmt(truth)} ${t("unit.nm")}`;
   $("r-true-alt").textContent = units(truth);
-  $("r-ruler").textContent = `${fmt(ruler)} n.m.`;
+  $("r-ruler").textContent = `${fmt(ruler)} ${t("unit.nm")}`;
   $("r-ruler-alt").textContent = units(ruler);
 
   $("r-gc-diff").textContent = G.agreement < 1e-6
-    ? "exact" : `${G.agreement.toExponential(1)}° apart`;
-  $("r-par").textContent = `${fmt(alongParallelNM(A.lat, dlon))} n.m.`;
+    ? t("dist.exact") : `${G.agreement.toExponential(1)}° ${t("dist.apart")}`;
+  $("r-par").textContent = `${fmt(alongParallelNM(A.lat, dlon))} ${t("unit.nm")}`;
 
   // The ruler is judged against Gleason's own figure, which is the chart's
   // method; the great circle sits alongside as a check on that figure.
@@ -477,13 +476,13 @@ function readouts() {
   const exact = Math.abs(err) < 0.05;
   const sign = diff > 0 ? "+" : diff < 0 ? "-" : "";
   const errEl = $("r-err");
-  errEl.textContent = exact ? "exact" : `${sign}${Math.abs(err).toFixed(1)}%`;
+  errEl.textContent = exact ? t("dist.exact") : `${sign}${Math.abs(err).toFixed(1)}%`;
   errEl.className = exact ? "" : "warn";
   const errAlt = $("r-err-alt");
   errAlt.textContent = exact ? "" : units(Math.abs(diff), sign, true);
   errAlt.className = exact ? "muted sub alt" : "warn sub alt";
 
-  $("r-rad").textContent = `${fmt((90 - A.lat) * NM_PER_DEGREE)} / ${fmt((90 - B.lat) * NM_PER_DEGREE)} n.m.`;
+  $("r-rad").textContent = `${fmt((90 - A.lat) * NM_PER_DEGREE)} / ${fmt((90 - B.lat) * NM_PER_DEGREE)} ${t("unit.nm")}`;
 
   const arcmin = Math.abs(dlon) * 60;
   $("r-arcmin").textContent = `${fmt(arcmin)}′`;
@@ -507,93 +506,86 @@ function equations({ A, B, dlon, minutes, truth, ruler, ax, ay, bx, by, G }) {
   const absLon = Math.abs(dlon);
 
   $("eq-time").innerHTML = `
-<h3>Difference of longitude</h3>
+<h3>${t("eq.dlon")}</h3>
 <div>Δλ = λB − λA
    = ${n(B.lon)}° − ${n(A.lon)}° = ${res(dlon.toFixed(2) + "°")}</div>
-<h3>Longitude as sun time</h3>
+<h3>${t("eq.asTime")}</h3>
 <div>Δt = Δλ × ${MINUTES_PER_DEGREE_LON} min/°
    = ${n(dlon)}° × ${MINUTES_PER_DEGREE_LON} = ${res(minutes.toFixed(1) + " min")} = ${res(formatHM(minutes))}</div>`;
 
   $("eq-dist").innerHTML = `
-<h3>From the difference in sun time</h3>
-<div>Δt = ${res(formatHM(minutes))} = ${n(G.hours, 4)} hours
+<h3>${t("eq.fromTime")}</h3>
+<div>Δt = ${res(formatHM(minutes))} = ${n(G.hours, 4)} ${t("unit.hours")}
 
-the sheet's rule: 15° of longitude to the hour
+${t("eq.rule15")}
 Δλ = Δt × 15°/h
    = ${n(G.hours, 4)} h × 15 = ${res(G.dlon.toFixed(2) + "°")}
 
-that angle taken with the two latitudes
+${t("eq.withLats")}
 cos σ = sin φA · sin φB
       + cos φA · cos φB · cos Δλ
       = ${n(G.cosSigma, 6)}
     σ = ${res(G.sigmaCos.toFixed(3) + "°")}
 
-Gleason's 60 geographical miles to the degree
+${t("eq.sixty")}
     d = σ × 60
       = ${n(G.sigma, 3)}° × 60 = ${res(fmt(G.nm) + " n.m.")}
 
-so ${res(formatHM(minutes).replace(/^[+-]/, ""))} of sun time between these two
-places is ${res(fmt(G.nm) + " n.m.")}, ${res(fmt(nmToStatute(G.nm)) + " English miles")}</div>
-<h3>Straight ruler on the chart</h3>
-<div>L = length of the drawn line = ${n(L, 1)} px
-k = ${n(k, 4)} px per degree of arc
-d = (L ÷ k) × 60 n.m./°
-  = ${n(L / k, 3)}° × 60 = ${res(fmt(ruler) + " n.m.")}</div>
-<h3>Haversine, the same relation rearranged</h3>
+${t("eq.so")} ${res(formatHM(minutes).replace(/^[+-]/, ""))} ${t("eq.ofSunTime")}
+${t("eq.placesIs")} ${res(fmt(G.nm) + " " + t("unit.nm"))}, ${res(fmt(nmToStatute(G.nm)) + " " + t("unit.eng"))}</div>
+<h3>${t("eq.rulerHead")}</h3>
+<div>${t("eq.lineLen")} = ${n(L, 1)} px
+${t("eq.perDeg", n(k, 4))}
+d = (L ÷ k) × 60 ${t("unit.nm")}/°
+  = ${n(L / k, 3)}° × 60 = ${res(fmt(ruler) + " " + t("unit.nm"))}</div>
+<h3>${t("eq.haversineHead")}</h3>
 <div>a = sin²(Δφ/2)
   + cos φA · cos φB · sin²(Δλ/2)
 σ = 2 · asin(√a) = ${res(sigma.toFixed(3) + "°")}
-d = σ × 60 = ${res(fmt(truth) + " n.m.")}
-the cosine form above loses precision when the
-two places are close, so this is the arrangement
-the value is taken from. Both give the same σ.</div>
-<h3>Along the parallel of A, Fig. 43</h3>
-<div>this answers a different question: how far
-along A's own parallel, not the shortest way
+d = σ × 60 = ${res(fmt(truth) + " " + t("unit.nm"))}
+${t("eq.haversineNote")}</div>
+<h3>${t("eq.parallelHead")}</h3>
+<div>${t("eq.parallelNote")}
 d = |Δλ| × 60 × cos φA
   = ${n(absLon)}° × 60 × cos ${n(A.lat)}°
-  = ${res(fmt(alongParallelNM(A.lat, dlon)) + " n.m.")}</div>
-<h3>Radial from the pole</h3>
+  = ${res(fmt(alongParallelNM(A.lat, dlon)) + " " + t("unit.nm"))}</div>
+<h3>${t("eq.radialHead")}</h3>
 <div>d = (90° − φ) × 60
-A: (90 − ${n(A.lat)}) × 60 = ${res(fmt((90 - A.lat) * NM_PER_DEGREE) + " n.m.")}
-B: (90 − ${n(B.lat)}) × 60 = ${res(fmt((90 - B.lat) * NM_PER_DEGREE) + " n.m.")}</div>`;
+A: (90 − ${n(A.lat)}) × 60 = ${res(fmt((90 - A.lat) * NM_PER_DEGREE) + " " + t("unit.nm"))}
+B: (90 − ${n(B.lat)}) × 60 = ${res(fmt((90 - B.lat) * NM_PER_DEGREE) + " " + t("unit.nm"))}</div>`;
 
   $("eq-scale").innerHTML = `
-<h3>Fig. 38, longitude against sun time</h3>
-<div>arc = |Δλ| × 60 = ${n(absLon)}° × 60 = ${res(fmt(absLon * 60) + "′")}
+<h3>${t("eq.fig38")}</h3>
+<div>${t("eq.arc")} = |Δλ| × 60 = ${n(absLon)}° × 60 = ${res(fmt(absLon * 60) + "′")}
 t   = |Δλ| × ${MINUTES_PER_DEGREE_LON} min/° = ${res(formatHM(minutes).replace(/^[+-]/, ""))}</div>
-<h3>Fig. 37, geographical against English miles</h3>
-<div>geo = |Δλ| × 60 = ${res(fmt(absLon * NM_PER_DEGREE) + " geo. miles")}
-Eng = geo × ${NAUTICAL_FEET}/${STATUTE_FEET}
+<h3>${t("eq.fig37")}</h3>
+<div>${t("eq.geo")} = |Δλ| × 60 = ${res(fmt(absLon * NM_PER_DEGREE) + " " + t("unit.geo"))}
+${t("eq.eng")} = ${t("eq.geo")} × ${NAUTICAL_FEET}/${STATUTE_FEET}
     = ${n(absLon * NM_PER_DEGREE, 1)} × ${STATUTE_PER_NM.toFixed(5)}
-    = ${res(fmt(absLon * NM_PER_DEGREE * STATUTE_PER_NM) + " Eng. miles")}</div>`;
+    = ${res(fmt(absLon * NM_PER_DEGREE * STATUTE_PER_NM) + " " + t("unit.engShort"))}</div>`;
 }
 
 const atSouthPole = (pt) => pt.lat <= -89.5;
 
 function note(err) {
   if (atSouthPole(state.A) || atSouthPole(state.B)) {
-    return "One dot on a globe projection, one whole circle on this one. The dashed "
-      + "ring is the pole itself, stretched to the size this projection gives "
-      + "it. Every part of that ring is the pole. The marker is just a handle. "
-      + "It sits on the other point's meridian, so the line between them runs "
-      + "along a radial and measures correctly.";
+    return t("note.pole");
   }
   if (view.mode === "recentred") {
-    return "The chart is recentred on A, so every straight line out of A is a radial and the ruler is exact along it. Distances between two other points on this view are not.";
+    return t("note.recentred");
   }
   if (Math.abs(err) < 0.05) {
-    return "This line passes through the centre of the chart, so it lies along a radial and the ruler is reading the scale it appears to be reading.";
+    return t("note.radial");
   }
-  return "This line does not pass through the centre, so it is not along a radial. Recentre the chart on A to measure it with a straight edge.";
+  return t("note.offCentre");
 }
 
 // Value and unit are joined by a non-breaking space, so a line that has to wrap
 // breaks at a separator rather than orphaning "km" onto its own line.
 function units(nm, sign = "", withNautical = false) {
   const part = (v, unit) => `${sign}${fmt(v)}\u00a0${unit}`;
-  const bits = withNautical ? [part(nm, "n.m.")] : [];
-  bits.push(part(nmToStatute(nm), "English\u00a0miles"), part(nmToKm(nm), "km"));
+  const bits = withNautical ? [part(nm, t("unit.nm"))] : [];
+  bits.push(part(nmToStatute(nm), t("unit.eng").replace(/ /g, "\u00a0")), part(nmToKm(nm), t("unit.km")));
   return bits.join(" · ");
 }
 
