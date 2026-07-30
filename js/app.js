@@ -160,6 +160,7 @@ $("t-path").addEventListener("change", (e) => { view.showTruePath = e.target.che
 $("t-ruler").addEventListener("change", (e) => { view.showRuler = e.target.checked; view.draw(); });
 $("t-grat").addEventListener("change", (e) => { view.showGraticule = e.target.checked; view.draw(); });
 $("t-arms").addEventListener("change", (e) => { view.showArms = e.target.checked; view.draw(); });
+$("t-rings").addEventListener("change", (e) => { view.showRings = e.target.checked; view.draw(); });
 $("fit-disc").addEventListener("click", () => setZoom("disc"));
 $("fit-sheet").addEventListener("click", () => setZoom("sheet"));
 
@@ -371,6 +372,10 @@ function readUrl() {
     if (Number.isFinite(lat) && Number.isFinite(lon)) state[key.toUpperCase()] = { lat, lon };
   }
   if (q.get("zoom") === "sheet") state.zoom = "sheet";
+  if (q.get("rings") === "1") {
+    $("t-rings").checked = true;
+    view.showRings = true;
+  }
   if (q.get("arms") === "1") {
     $("t-arms").checked = true;
     view.showArms = true;
@@ -385,6 +390,7 @@ function writeUrl() {
   if (view.mode === "recentred") q.set("mode", "recentred");
   if ($("fit-sheet").classList.contains("on")) q.set("zoom", "sheet");
   if (view.showArms) q.set("arms", "1");
+  if (view.showRings) q.set("rings", "1");
   history.replaceState(null, "", `?${q}`);
 }
 

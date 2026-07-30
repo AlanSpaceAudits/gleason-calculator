@@ -32,6 +32,7 @@ export class ChartView {
     this.showRuler = true;
     this.showGraticule = false;
     this.showArms = false;
+    this.showRings = false;
 
     this._sourceData = null;
     this._obliqueCanvas = null;
@@ -190,6 +191,7 @@ export class ChartView {
     ctx.restore();
 
     if (this.showGraticule) this._drawGraticule();
+    if (this.showRings) this._drawRings();
 
     const { A, B } = this.points;
     if (this.showArms && A && B) this._drawArms(A, B);
@@ -260,6 +262,38 @@ export class ChartView {
     ctx.restore();
   }
 
+  // The tropics and the polar circles, the four parallels the sheet names.
+  // Drawn through the projection so they stay correct when it is recentred.
+  _drawRings() {
+    const RINGS = [
+      ["Arctic Circle", 66.56, "#1d7fae"],
+      ["Tropic of Cancer", 23.44, "#8a6d1f"],
+      ["Tropic of Capricorn", -23.44, "#8a6d1f"],
+      ["Antarctic Circle", -66.56, "#1d7fae"],
+    ];
+    const ctx = this.ctx;
+    for (const [name, lat, colour] of RINGS) {
+      const pts = [];
+      for (let lon = -180; lon <= 180; lon += 1) pts.push([lat, lon]);
+      this._polyline(pts, { colour, width: 2.5, dash: [10, 5], casing: 3.5 });
+
+      // label where the parallel crosses the bearing that points up the sheet
+      const p = this.proj.forward(lat, this.proj.rot ?? 0);
+      if (!p) continue;
+      const [lx, ly] = this.toScreen(p[0], p[1]);
+      ctx.save();
+      ctx.font = "600 11px ui-sans-serif, system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = "rgba(255, 253, 248, 0.96)";
+      ctx.fillStyle = colour;
+      ctx.strokeText(name, lx, ly);
+      ctx.fillText(name, lx, ly);
+      ctx.restore();
+    }
+  }
+
   // Gleason's two indicating arms. They pivot at the centre of the projection
   // and the angle between them is the difference of longitude, which the sheet
   // reads off its dial as sun time. The patent describes them as graduated in
@@ -275,8 +309,13 @@ export class ChartView {
     const reach = k * 180 * this.scale;   // out to the rim, in screen pixels
     const perDeg = k * this.scale;
 
-    for (const pt of [A, B]) {
-      this._drawArm(sx, sy, rot - pt.lon - 90, reach, perDeg);
+    // Each arm is offset to its own side, so the graduated inner edge runs
+    // through its point instead of the point sitting under the middle of the
+    // card. That is how you would lay a real arm on the sheet: edge to the mark.
+    const dlon = deltaLon(A.lon, B.lon);
+    for (const [pt, other] of [[A, B], [B, A]]) {
+      const toward = deltaLon(pt.lon, other.lon) < 0 ? 1 : -1;
+      this._drawArm(sx, sy, rot - pt.lon - 90, reach, perDeg, -toward);
     }
     this._drawArmAngle(sx, sy, A, B, perDeg);
 
@@ -295,21 +334,23 @@ export class ChartView {
   // One arm: opaque card, graduated along both edges, numbered in degrees of
   // latitude every fifteen, with a shadow so it reads as an object lying on the
   // sheet rather than a line drawn on it.
-  _drawArm(sx, sy, angleDeg, reach, perDeg) {
+  _drawArm(sx, sy, angleDeg, reach, perDeg, side) {
     const ctx = this.ctx;
     const a = angleDeg * D2R;
     const wBase = 26, wTip = 21, r = wTip / 2;
+    const o = side;                       // which way the body lies off the edge
 
     ctx.save();
     ctx.translate(sx, sy);
     ctx.rotate(a);
 
-    // the body, tapering slightly to a rounded tip
+    // body: the inner edge sits on y = 0, along the bearing to the point
     ctx.beginPath();
-    ctx.moveTo(0, -wBase / 2);
-    ctx.lineTo(reach - r, -wTip / 2);
-    ctx.arc(reach - r, 0, r, -Math.PI / 2, Math.PI / 2);
-    ctx.lineTo(0, wBase / 2);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(reach - r, 0);
+    ctx.arc(reach - r, o * r, r, o > 0 ? -Math.PI / 2 : Math.PI / 2,
+            o > 0 ? Math.PI / 2 : -Math.PI / 2, o < 0);
+    ctx.lineTo(0, o * wBase);
     ctx.closePath();
 
     ctx.save();
@@ -327,7 +368,7 @@ export class ChartView {
 
     if (reach < 110) { ctx.restore(); return; }
 
-    // graduations: five degrees fine, fifteen heavy and numbered
+    // graduations run in from the inner edge, five degrees fine, fifteen heavy
     const flip = Math.cos(a) < 0;
     const limit = reach - r;
     ctx.strokeStyle = "#5e4d28";
@@ -337,11 +378,10 @@ export class ChartView {
       const x = colat * perDeg;
       if (x > limit) break;
       const heavy = colat % 15 === 0;
-      const len = heavy ? 6.5 : 3.5;
       ctx.lineWidth = heavy ? 1.1 : 0.7;
       ctx.beginPath();
-      ctx.moveTo(x, -wTip / 2); ctx.lineTo(x, -wTip / 2 + len);
-      ctx.moveTo(x, wTip / 2); ctx.lineTo(x, wTip / 2 - len);
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, o * (heavy ? 7.5 : 4));
       ctx.stroke();
     }
 
@@ -354,7 +394,7 @@ export class ChartView {
         const x = colat * perDeg;
         if (x > limit) break;
         ctx.save();
-        ctx.translate(x, 0);
+        ctx.translate(x, o * wTip * 0.62);
         ctx.rotate(flip ? Math.PI / 2 : -Math.PI / 2);
         ctx.fillText(String(Math.abs(90 - colat)), 0, 0);
         ctx.restore();
