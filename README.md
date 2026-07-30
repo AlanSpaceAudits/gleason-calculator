@@ -23,6 +23,7 @@ node js/test.js                 # coordinate maths self-check
 |---|---|
 | Longitude and time | Difference of longitude, difference in sun time at four minutes to the degree, local sun time at each point |
 | Distance | Shortest distance through the graticule, against a straight ruler laid on the chart, with the discrepancy stated |
+| Ruler arms | Gleason's two indicating arms, pivoted at the pole, with the angle between the meridians read as sun time |
 | Recentred view | The scan replotted about point A, where a straight ruler reads correctly |
 | Printed scales | Gleason's Figs. 37 and 38 as engraved on the sheet, with live readings against them |
 | Worked examples | Seven presets covering the radial case, the off-centre case, recentring and why it works, the cosine of latitude, and the pole drawn as the rim |

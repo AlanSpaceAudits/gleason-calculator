@@ -1,7 +1,8 @@
 // Canvas view of the chart: pan, zoom, overlays, and the recentred rebuild.
 
 import {
-  makeProjection, makeObliqueProjection, greatCirclePath, centralAngle, D2R,
+  makeProjection, makeObliqueProjection, greatCirclePath, centralAngle,
+  deltaLon, MINUTES_PER_DEGREE_LON, D2R,
 } from "./geo.js";
 
 const OBLIQUE_SIDE = 1400; // working size of the recentred rebuild, in its own pixels
@@ -30,6 +31,7 @@ export class ChartView {
     this.showTruePath = true;
     this.showRuler = true;
     this.showGraticule = false;
+    this.showArms = false;
 
     this._sourceData = null;
     this._obliqueCanvas = null;
@@ -190,6 +192,7 @@ export class ChartView {
     if (this.showGraticule) this._drawGraticule();
 
     const { A, B } = this.points;
+    if (this.showArms && A && B) this._drawArms(A, B);
     // A point on the rim has no single position, so the ruler and the markers
     // use the resolved placement, the same one the readouts measure against.
     const rA = this.resolve(A, B), rB = this.resolve(B, A);
@@ -254,6 +257,72 @@ export class ChartView {
       }
       ctx.stroke();
     }
+    ctx.restore();
+  }
+
+  // Gleason's two indicating arms. They pivot at the centre of the projection
+  // and the angle between them is the difference of longitude, which the sheet
+  // reads off its dial as sun time. Only meaningful on the printed chart, where
+  // the centre is the pole and a radial is a meridian.
+  _drawArms(A, B) {
+    if (this.mode !== "printed") return;
+    const ctx = this.ctx;
+    const { cx, cy, k, rot } = this.proj;
+    const reach = k * 180;   // out to the rim, the limit the engraving draws
+    const [sx, sy] = this.toScreen(cx, cy);
+
+    const arm = (lon) => {
+      const b = (rot - lon) * D2R;
+      const [ex, ey] = this.toScreen(cx + reach * Math.sin(b), cy - reach * Math.cos(b));
+      ctx.lineWidth = 7;
+      ctx.strokeStyle = "rgba(255, 253, 248, 0.95)";
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#3d2f16";
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+      // a tick where the arm meets the rim, as the graduated edge would read
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(ex, ey, 4, 0, Math.PI * 2);
+      ctx.stroke();
+      return [ex, ey];
+    };
+
+    ctx.save();
+    ctx.lineCap = "round";
+    arm(A.lon);
+    arm(B.lon);
+
+    // the included angle, swept the short way
+    const dlon = deltaLon(A.lon, B.lon);
+    const tA = (rot - A.lon - 90) * D2R;
+    const r = Math.abs(k * 40 * this.scale);
+    ctx.setLineDash([5, 4]);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#8a6d1f";
+    ctx.beginPath();
+    ctx.arc(sx, sy, r, tA, tA - dlon * D2R, dlon > 0);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // pivot
+    ctx.fillStyle = "#3d2f16";
+    ctx.beginPath(); ctx.arc(sx, sy, 4, 0, Math.PI * 2); ctx.fill();
+
+    // reading, placed off the middle of the sweep
+    const mid = tA - dlon * D2R / 2;
+    const lx = sx + (r + 18) * Math.cos(mid);
+    const ly = sy + (r + 18) * Math.sin(mid);
+    const mins = Math.abs(dlon) * MINUTES_PER_DEGREE_LON;
+    const label = `${Math.abs(dlon).toFixed(2)}\u00b0 = ${Math.floor(mins / 60)}h ${(mins % 60).toFixed(1)}m`;
+    ctx.font = "600 13px ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = Math.cos(mid) < 0 ? "right" : "left";
+    ctx.textBaseline = "middle";
+    ctx.lineWidth = 3.5;
+    ctx.strokeStyle = "rgba(255, 253, 248, 0.95)";
+    ctx.fillStyle = "#6b5313";
+    ctx.strokeText(label, lx, ly);
+    ctx.fillText(label, lx, ly);
     ctx.restore();
   }
 

@@ -159,6 +159,7 @@ for (const key of ["A", "B"]) {
 $("t-path").addEventListener("change", (e) => { view.showTruePath = e.target.checked; view.draw(); });
 $("t-ruler").addEventListener("change", (e) => { view.showRuler = e.target.checked; view.draw(); });
 $("t-grat").addEventListener("change", (e) => { view.showGraticule = e.target.checked; view.draw(); });
+$("t-arms").addEventListener("change", (e) => { view.showArms = e.target.checked; view.draw(); });
 $("fit-disc").addEventListener("click", () => setZoom("disc"));
 $("fit-sheet").addEventListener("click", () => setZoom("sheet"));
 
@@ -370,6 +371,10 @@ function readUrl() {
     if (Number.isFinite(lat) && Number.isFinite(lon)) state[key.toUpperCase()] = { lat, lon };
   }
   if (q.get("zoom") === "sheet") state.zoom = "sheet";
+  if (q.get("arms") === "1") {
+    $("t-arms").checked = true;
+    view.showArms = true;
+  }
   return q.get("mode") === "recentred" ? "recentred" : "printed";
 }
 
@@ -379,12 +384,20 @@ function writeUrl() {
   q.set("b", `${state.B.lat.toFixed(4)},${state.B.lon.toFixed(4)}`);
   if (view.mode === "recentred") q.set("mode", "recentred");
   if ($("fit-sheet").classList.contains("on")) q.set("zoom", "sheet");
+  if (view.showArms) q.set("arms", "1");
   history.replaceState(null, "", `?${q}`);
 }
 
 function setMode(mode) {
   $("mode-printed").classList.toggle("on", mode === "printed");
   $("mode-recentred").classList.toggle("on", mode === "recentred");
+  // The arms measure longitude about the pole. Recentred, the centre is no
+  // longer the pole, so there is nothing for them to read.
+  const arms = $("t-arms");
+  arms.disabled = mode !== "printed";
+  arms.parentElement.title = arms.disabled
+    ? "The arms read longitude about the pole, so they apply to the printed chart only"
+    : "Two arms pivoted at the pole, reading the angle between the two meridians";
   if (mode === "printed") {
     view.showPrinted();
     refresh();
