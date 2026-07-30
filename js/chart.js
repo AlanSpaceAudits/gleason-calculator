@@ -262,65 +262,136 @@ export class ChartView {
 
   // Gleason's two indicating arms. They pivot at the centre of the projection
   // and the angle between them is the difference of longitude, which the sheet
-  // reads off its dial as sun time. Only meaningful on the printed chart, where
-  // the centre is the pole and a radial is a meridian.
+  // reads off its dial as sun time. The patent describes them as graduated in
+  // degrees of latitude, read outward from the pole, so they are drawn as
+  // instrument arms lying over the engraving rather than as lines on it.
+  // Only meaningful on the printed chart, where the centre is the pole and a
+  // radial is a meridian.
   _drawArms(A, B) {
     if (this.mode !== "printed") return;
     const ctx = this.ctx;
     const { cx, cy, k, rot } = this.proj;
-    const reach = k * 180;   // out to the rim, the limit the engraving draws
     const [sx, sy] = this.toScreen(cx, cy);
+    const reach = k * 180 * this.scale;   // out to the rim, in screen pixels
+    const perDeg = k * this.scale;
 
-    const arm = (lon) => {
-      const b = (rot - lon) * D2R;
-      const [ex, ey] = this.toScreen(cx + reach * Math.sin(b), cy - reach * Math.cos(b));
-      ctx.lineWidth = 7;
-      ctx.strokeStyle = "rgba(255, 253, 248, 0.95)";
-      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "#3d2f16";
-      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
-      // a tick where the arm meets the rim, as the graduated edge would read
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(ex, ey, 4, 0, Math.PI * 2);
-      ctx.stroke();
-      return [ex, ey];
-    };
+    for (const pt of [A, B]) {
+      this._drawArm(sx, sy, rot - pt.lon - 90, reach, perDeg);
+    }
+    this._drawArmAngle(sx, sy, A, B, perDeg);
+
+    // the eyelet the arms turn on, drawn last so it sits over both
+    ctx.save();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#3d2f16";
+    ctx.fillStyle = "#fffdf8";
+    ctx.beginPath();
+    ctx.arc(sx, sy, 5.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // One arm: opaque card, graduated along both edges, numbered in degrees of
+  // latitude every fifteen, with a shadow so it reads as an object lying on the
+  // sheet rather than a line drawn on it.
+  _drawArm(sx, sy, angleDeg, reach, perDeg) {
+    const ctx = this.ctx;
+    const a = angleDeg * D2R;
+    const wBase = 26, wTip = 21, r = wTip / 2;
 
     ctx.save();
-    ctx.lineCap = "round";
-    arm(A.lon);
-    arm(B.lon);
+    ctx.translate(sx, sy);
+    ctx.rotate(a);
 
-    // the included angle, swept the short way
+    // the body, tapering slightly to a rounded tip
+    ctx.beginPath();
+    ctx.moveTo(0, -wBase / 2);
+    ctx.lineTo(reach - r, -wTip / 2);
+    ctx.arc(reach - r, 0, r, -Math.PI / 2, Math.PI / 2);
+    ctx.lineTo(0, wBase / 2);
+    ctx.closePath();
+
+    ctx.save();
+    ctx.shadowColor = "rgba(45, 33, 12, 0.34)";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 4;
+    ctx.fillStyle = "#f1e7d0";
+    ctx.fill();
+    ctx.restore();
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#a8946a";
+    ctx.stroke();
+
+    if (reach < 110) { ctx.restore(); return; }
+
+    // graduations: five degrees fine, fifteen heavy and numbered
+    const flip = Math.cos(a) < 0;
+    const limit = reach - r;
+    ctx.strokeStyle = "#5e4d28";
+    ctx.fillStyle = "#3f3418";
+
+    for (let colat = 5; colat <= 180; colat += 5) {
+      const x = colat * perDeg;
+      if (x > limit) break;
+      const heavy = colat % 15 === 0;
+      const len = heavy ? 6.5 : 3.5;
+      ctx.lineWidth = heavy ? 1.1 : 0.7;
+      ctx.beginPath();
+      ctx.moveTo(x, -wTip / 2); ctx.lineTo(x, -wTip / 2 + len);
+      ctx.moveTo(x, wTip / 2); ctx.lineTo(x, wTip / 2 - len);
+      ctx.stroke();
+    }
+
+    // numerals read across the arm, as they are stamped on the originals
+    if (reach > 200) {
+      ctx.font = "600 9px ui-sans-serif, system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (let colat = 15; colat <= 180; colat += 15) {
+        const x = colat * perDeg;
+        if (x > limit) break;
+        ctx.save();
+        ctx.translate(x, 0);
+        ctx.rotate(flip ? Math.PI / 2 : -Math.PI / 2);
+        ctx.fillText(String(Math.abs(90 - colat)), 0, 0);
+        ctx.restore();
+      }
+    }
+
+    ctx.restore();
+  }
+
+  // The included angle, swept the short way, with its reading in sun time.
+  _drawArmAngle(sx, sy, A, B, perDeg) {
+    const ctx = this.ctx;
     const dlon = deltaLon(A.lon, B.lon);
-    const tA = (rot - A.lon - 90) * D2R;
-    const r = Math.abs(k * 40 * this.scale);
+    if (Math.abs(dlon) < 0.01) return;
+    const tA = (this.proj.rot - A.lon - 90) * D2R;
+    const r = Math.max(34, Math.min(perDeg * 52, 150));
+
+    ctx.save();
     ctx.setLineDash([5, 4]);
     ctx.lineWidth = 2;
-    ctx.strokeStyle = "#8a6d1f";
+    ctx.strokeStyle = "#a4161a";
     ctx.beginPath();
     ctx.arc(sx, sy, r, tA, tA - dlon * D2R, dlon > 0);
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // pivot
-    ctx.fillStyle = "#3d2f16";
-    ctx.beginPath(); ctx.arc(sx, sy, 4, 0, Math.PI * 2); ctx.fill();
-
-    // reading, placed off the middle of the sweep
     const mid = tA - dlon * D2R / 2;
-    const lx = sx + (r + 18) * Math.cos(mid);
-    const ly = sy + (r + 18) * Math.sin(mid);
+    const lx = sx + (r + 16) * Math.cos(mid);
+    const ly = sy + (r + 16) * Math.sin(mid);
     const mins = Math.abs(dlon) * MINUTES_PER_DEGREE_LON;
     const label = `${Math.abs(dlon).toFixed(2)}\u00b0 = ${Math.floor(mins / 60)}h ${(mins % 60).toFixed(1)}m`;
     ctx.font = "600 13px ui-sans-serif, system-ui, sans-serif";
     ctx.textAlign = Math.cos(mid) < 0 ? "right" : "left";
     ctx.textBaseline = "middle";
-    ctx.lineWidth = 3.5;
-    ctx.strokeStyle = "rgba(255, 253, 248, 0.95)";
-    ctx.fillStyle = "#6b5313";
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(255, 253, 248, 0.96)";
+    ctx.fillStyle = "#a4161a";
     ctx.strokeText(label, lx, ly);
     ctx.fillText(label, lx, ly);
     ctx.restore();
