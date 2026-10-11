@@ -90,6 +90,7 @@
   "note.recentred": "Mapa je vystredená na A, takže každá priamka vedená z A je radiála a pravítko je po nej presné. Vzdialenosti medzi dvoma inými bodmi v tomto zobrazení presné nie sú.",
   "note.radial": "Táto priamka prechádza stredom mapy, leží teda na radiále a pravítko číta práve tú mierku, ktorú sa zdá, že číta.",
   "note.offCentre": "Táto priamka neprechádza stredom, neleží teda na radiále. Vystreďte mapu na A a potom ju možno merať pravítkom.",
+  "note.overPole": "Táto priamka stredom prechádza, sú to však dve radiály za sebou a spolu merajú viac než polovicu obvodu. Kratšia cesta medzi týmito dvoma miestami vedie cez južný pól, ktorý táto mapa kreslí ako svoj okraj. Pravítko číta tú dlhšiu cestu.",
   "note.pole": "Jedna bodka na kulovej projekcii, celá kružnica na tejto. Prerušovaný kruh je sám pól, roztiahnutý do veľkosti, ktorú mu táto projekcia dáva. Každá časť toho kruhu je pól. Značka je len úchyt. Leží na poludníku druhého bodu, aby priamka medzi nimi viedla po radiále a merala správne.",
   "ring.arctic": "Severný polárny kruh",
   "ring.cancer": "Obratník Raka",

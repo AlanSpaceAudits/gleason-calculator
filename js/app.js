@@ -577,6 +577,12 @@ function note(err) {
   if (Math.abs(err) < 0.05) {
     return t("note.radial");
   }
+  // Opposite meridians: the line is two radials through the centre. It reads
+  // true only while they sum to half a turn or less; past that the short way is
+  // over the south pole.
+  if (Math.abs(Math.abs(deltaLon(state.A.lon, state.B.lon)) - 180) < 0.5) {
+    return t("note.overPole");
+  }
   return t("note.offCentre");
 }
 

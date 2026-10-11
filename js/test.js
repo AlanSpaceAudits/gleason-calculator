@@ -91,6 +91,16 @@ assert.equal(sunTimeAt(-15), "11:00:00", "one hour behind at 15 W");
   near(ruler, truth, 1e-6, "ruler along a radial through the centre");
 }
 
+// Opposite meridians, both far south: the line still passes through the centre,
+// but the two radials sum to more than half a turn, so the ruler reads the long
+// way while the short way is over the south pole.
+{
+  const [ax, ay] = P.forward(-89, 90);
+  const [bx, by] = P.forward(-89, -90);
+  near(rulerNM(ax, ay, bx, by, chart.px_per_degree), 358 * 60, 0.5, "ruler through the centre, long way");
+  near(trueNM(-89, 90, -89, -90), 120, 1e-6, "short way over the south pole");
+}
+
 // Two points at the same latitude far from the centre: the straight line does
 // not pass through the centre, and the reading is wrong by a wide margin.
 {

@@ -90,6 +90,7 @@
   "note.recentred": "The chart is recentred on A, so every straight line out of A is a radial and the ruler is exact along it. Distances between two other points on this view are not.",
   "note.radial": "This line passes through the centre of the chart, so it lies along a radial and the ruler is reading the scale it appears to be reading.",
   "note.offCentre": "This line does not pass through the centre, so it is not along a radial. Recentre the chart on A to measure it with a straight edge.",
+  "note.overPole": "This line does pass through the centre, but it is two radials laid end to end, and together they run more than halfway round. The shorter way between these two places goes over the south pole, which this chart draws as its rim. The ruler is reading the longer way.",
   "note.pole": "One dot on a globe projection, one whole circle on this one. The dashed ring is the pole itself, stretched to the size this projection gives it. Every part of that ring is the pole. The marker is just a handle. It sits on the other point's meridian, so the line between them runs along a radial and measures correctly.",
   "ring.arctic": "Arctic Circle",
   "ring.cancer": "Tropic of Cancer",
